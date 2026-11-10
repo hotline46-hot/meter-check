@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>เช็คมิเตอร์ PEA</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#4b1c73">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="เช็คมิเตอร์">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" href="icon-192.png">
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#f5f6f8;--card:#fff;--tx:#1b1f24;--mu:#667085;--bd:#d9dde3;--ac:#6b2d8f;--ok:#1a7f4b;--bad:#c62828;--warn:#b26a00}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#14161a;--card:#1f2228;--tx:#eef0f3;--mu:#9aa3b0;--bd:#343943;--ac:#c58be6;--ok:#4cc38a;--bad:#ff7b7b;--warn:#ffb74d}}
+:root[data-theme="dark"]{--bg:#14161a;--card:#1f2228;--tx:#eef0f3;--mu:#9aa3b0;--bd:#343943;--ac:#c58be6;--ok:#4cc38a;--bad:#ff7b7b;--warn:#ffb74d}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 system-ui,-apple-system,"Noto Sans Thai",sans-serif}
+main{max-width:560px;margin:0 auto;padding:14px}
+h1{font-size:20px;margin:4px 0 12px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:12px;margin-bottom:12px}
+.card h2{font-size:15px;margin:0 0 8px;color:var(--mu)}
+button,select,input[type=text]{font:inherit;padding:10px 12px;border-radius:10px;border:1px solid var(--bd);background:var(--card);color:var(--tx)}
+button{background:var(--ac);color:#fff;border:0;font-weight:600}
+button.sec{background:transparent;color:var(--ac);border:1px solid var(--ac)}
+.row{display:flex;gap:8px;flex-wrap:wrap}.row>*{flex:1;min-width:120px}
+#reader{width:100%;margin-top:8px}
+#msg{margin-top:8px;padding:10px;border-radius:10px;font-weight:600;display:none}
+.m-ok{background:rgba(26,127,75,.15);color:var(--ok)}.m-bad{background:rgba(198,40,40,.15);color:var(--bad)}.m-warn{background:rgba(178,106,0,.15);color:var(--warn)}
+.stats{display:flex;gap:8px}.stat{flex:1;text-align:center;padding:8px;border-radius:10px;border:1px solid var(--bd)}
+.stat b{display:block;font-size:24px}
+.tabs{display:flex;gap:6px;margin:10px 0}.tabs button{flex:1;padding:8px;background:transparent;color:var(--tx);border:1px solid var(--bd);font-weight:500}
+.tabs button.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+.mtabs{display:flex;gap:6px;margin:0 0 12px}.mtabs button{flex:1;background:transparent;color:var(--tx);border:1px solid var(--bd);font-weight:500}.mtabs button.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+.list{max-height:320px;overflow-y:auto}
+.it{padding:8px 0;border-bottom:1px solid var(--bd)}.it small{color:var(--mu);display:block}
+label{font-size:13px;color:var(--mu);display:block;margin-bottom:2px}
+.hide{display:none}
+:root{--bg:#f3ecfa;--card:#fff;--bd:#e2d4f0;--ac:#5b2a86;--mu:#6d5f80;--gold:#f2b705;--tx:#24192f}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#140c1e;--card:#21152e;--bd:#3d2a54;--ac:#c39be8;--mu:#a99bbd;--gold:#ffd24d;--tx:#f1eaf8}}
+:root[data-theme="dark"]{--bg:#140c1e;--card:#21152e;--bd:#3d2a54;--ac:#c39be8;--mu:#a99bbd;--gold:#ffd24d;--tx:#f1eaf8}
+body{background:radial-gradient(900px 420px at 50% -80px,rgba(139,63,181,.35),transparent 70%) fixed,var(--bg)}
+body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.07;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72'%3E%3Cpath d='M40 8L22 38h12l-4 26 20-32H38z' fill='%236b2d8f'/%3E%3C/svg%3E")}
+.hero{display:flex;gap:12px;align-items:center;padding:16px;margin-bottom:14px;border-radius:18px;color:#fff;background:linear-gradient(135deg,#3b0f63,#6b2d8f 60%,#8a3fb5);box-shadow:0 8px 22px rgba(75,25,115,.35);border-bottom:4px solid var(--gold)}
+.hero .bolt{flex:0 0 46px;height:46px;border-radius:50%;background:var(--gold);color:#3b0f63;display:grid;place-items:center;font-size:24px}
+.hero .org{font-size:12px;letter-spacing:.3px;opacity:.85}
+.hero h1{margin:2px 0 0;font-size:19px;color:#fff}
+.hero .sub{font-size:13px;opacity:.8}
+.card{border-radius:16px;box-shadow:0 2px 10px rgba(91,42,134,.1)}
+.card h2{color:var(--ac);border-left:4px solid var(--gold);padding-left:8px}
+button{min-height:44px;border-radius:12px;background:linear-gradient(135deg,#6b2d8f,#8a3fb5);color:#fff;box-shadow:0 3px 8px rgba(91,42,134,.25)}
+button.sec{background:transparent;color:var(--ac);box-shadow:none}
+.tabs button,.mtabs button{background:transparent;color:var(--tx);box-shadow:none;min-height:40px}
+.tabs button.on,.mtabs button.on{background:linear-gradient(135deg,#6b2d8f,#8a3fb5);color:#fff;border-color:transparent}
+.stat{border-radius:12px;background:var(--bg)}
+input[type=text],select{border-radius:12px}
+.hero .logo{flex:0 0 62px;width:62px;height:62px;border-radius:14px;background:#fff;padding:3px;object-fit:contain;box-shadow:0 2px 6px rgba(0,0,0,.25)}
+.hero .mascot{flex:0 0 46px;width:46px;height:auto}
+.hero>div:not(.bolt){flex:1;min-width:0}
+body{font-size:17px}
+.card{border:2px solid var(--bd);border-radius:20px}
+.card h2{font-size:17px;color:var(--tx)}
+button{border-bottom:4px solid #3b0f63;font-size:16px}
+button:active{transform:translateY(3px);border-bottom-width:1px}
+button.sec{border-bottom:4px solid var(--bd)}
+.big{min-height:64px;font-size:20px}
+.mtabs button{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 2px;font-size:13px;min-height:68px;border-bottom:4px solid var(--bd)}
+.mtabs button span{font-size:26px;line-height:1}
+.tabs button{border-bottom:4px solid var(--bd)}
+.mtabs button.on,.tabs button.on{border-bottom-color:#3b0f63}
+.stat{border:2px solid var(--bd);font-size:13px}
+.stat b{font-size:30px;font-weight:800}
+.xp{position:relative;height:26px;border-radius:13px;background:var(--bg);border:2px solid var(--bd);overflow:hidden;margin-bottom:10px}
+.xpb{height:100%;width:0;background:linear-gradient(90deg,#f2b705,#ffd24d);transition:width .4s}
+.xp span{position:absolute;inset:0;display:grid;place-items:center;font-size:13px;font-weight:800;color:var(--tx);text-shadow:0 0 3px var(--bg),0 0 3px var(--bg)}
+#msg{font-size:18px;text-align:center;border-radius:14px;padding:14px;animation:pop .3s}
+@keyframes pop{0%{transform:scale(.85);opacity:.4}60%{transform:scale(1.04)}100%{transform:scale(1);opacity:1}}
+.it{font-size:18px;font-weight:600;padding:10px 0}
+.man{border:2px solid var(--bd);border-radius:14px;padding:0 12px;margin-bottom:8px}
+.man summary{padding:12px 0;font-weight:700;font-size:16px;cursor:pointer}
+.man ol,.man ul{margin:0 0 12px;padding-left:22px;font-size:15px;line-height:1.7}
+.row>div{min-width:0}
+input[type=text]{box-sizing:border-box;width:100%;min-width:0}
+.it{word-break:break-all}
+#cols .row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+#cols select{width:100%;box-sizing:border-box}
+</style>
+</head>
+<body>
+<main>
+<header class="hero"><img class="logo" alt="PEA การไฟฟ้าส่วนภูมิภาค" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAOEAAADhCAMAAAAJbSJIAAABIFBMVEX///9qFoasgB3s7OxiAIBlAIJhAIDw6NaneABfAH6yiSf9+/T39Onx69vm2sTHqHLr4Mzu5di/oWS1k0r27+W4kj7j07nQvZargRHdz7PVwJ5nC4S7mE63kUG4l0XayqrXxt60jTLPtYdXAHns5O/27/i8oci4msTf0eXJr33Ns4v7+fuJT56XZ6i/oWXGsNCgeLCOVqF+OJaCQ5lwIIp1LI/i1uawjL3DqczMudaYb6mograSYKXSwNqlcwC/nsdkAIuaZW2MU3qETpmldlWCP5qdZ62rfbx4NYSISISTWnOcammjdV2hcWODQIR0L4enek6rfz2pfkWPTaV/NZqwgzKvhwyYYHaQY6KbY6+ojreigbGESn5xIZWHQJ+NVHc8LfVwAAAgAElEQVR4nO1di0PbttaXU8vEAULKeJgqLAbLsZlsnPjtOGnoaGBbt3Z93nZb7/7//+I7kp0HFFgxoff2fj33rsQvWT/r6LwkHaEH6H+dviH8+ukbwq+fviH8+ukbwq+fviH8+unLIaSx7Vl5b+AOXHeQJ91RTM0v8d4vgpDqyTAIsariBYKj6NTt2vcN894RmqOeT2SZEOkKIljGoWPp91mB+0Vopo6s4CvBXYApnev3Vof7RJj1Dfkf0E0JqziP76cW94bQTIj6mfCmIB2P3UNF7glh3APWuy0RJeouH+O9IAR8+Nb4BMnLx3gPCM28Kj7Rjr633OosH2Ea3p4/L2CUnaXKnGUjjB3lVvLlaozJEmu0ZITW56qHm0mJlteMS0VoOuoy8Em8O1rLqtQyEY4Intew7IxEjoLoRjChP5k+R+S5iFL7SzJYl4jQUmbVw4FnhZgQojpZPvRvRBg5bgrSlxCMz7LeHCIO7aVUa2kI2WDGoYCL2cPB4HQy9Ng/Sx6CiU57QfC+51poPDdjCV6K3lgWQkAi2IxglTiJiWJK4zgescHnqA4im7oNt1NKUea+AQ4v2HUpnXFJCKnPq4SdUTAE3gKAwxDLZ2GeKf8AruTIfqy6wNaTLjyLTAt7iYAo53ev2nIQ0ohXiExQnnKT29Nl6FcfosCMPlN5yJlnuD4m6sCMhjoyA2aJxld7d67bUhDSUACRLTNBXaWXogBLwZkcfB6PFoxqdg1nCA6GbZ77AaPdB4XMuTvEZSCctpRqUzomCbZpOBz6ao6sSwBBXp5wCVv8uXgpYHqI+65vocB1IzbiX0kUeldGXQJC5s8+NzXJueEiOsGhS1GiLGIj0U8///Ls119/ffr0119/e/Lj8xfhyYL7jyeUjQMcWUg3hn7KmC6V3+2OJtwSEDq47EqIJvGHPlSIjWLTzPxZC5KT6K8nv79svNMW6eDV07+ff1xQDgll1AZzbXR67gK/U6coQE3/wwhFX4tC1UO6rwO41LNNypCdkym88MdfX3JIdSDtYB+oUfzW3jVePXs+tWhw3zOBC+gozShjgYWYRAT/q/p/FGGXAyTDro9yfK6jgapG59GE2Yk1JALf82dvBbrG8e7e+ionBP9ttTqHbYGy9uqX8IQjjKzEA0Hl9lUjpOx8MjG9IBValtD/IEJdNAB+z7xucDZEHnGhhgOWyJizH+D7vcHhtTvrVzy82tptcJBvnwmMGKsTM8Phec8JULd/FpmZLroymdzB8b8jQrPUEwli5xFIvcSJHItOe9DJT0958213Vq8vYf1QA4yNJx9JIZEylrn+v0FO6eTcZrQQVvIddMYdEQ5xISSg4zkZP2HqJvTH4mz4jOPbbP1DGaudbd6OP54IrsYWQzrlbcYi+OMW30rJKlfxbgjTwtrGGbIYNKM3eO10UTd3eV3xXy+1Wn3zKu78hPbe1rV3T1/wDxP0Ekr//fqDRRH1RpSVkjqs3BXvhJAW4hKPUNZDrCs5buCbvip6oPQbtF+7+blFParVeTPyRsTqqIuHZ8SlbJSzEqLsVq3knRAWPAp6wnqToKGcOzKhbiF6XryC7rV7i7K2jus17Vlh6SjmECSyg+PYCUywmMhd+PQuCEdcDETYRV3V6abSeSjjWJyTTv56q9W/f3jFM63rhU5Hq2lPheTCQ9ZXsdsPWRQ6yFZC0asrytO7IORmFU4kM1YjP+5/UFU3TkULnvzdqNWPrgKxXW9f3zG3DuraqxdE8CTthkbgx44Ddmkwlgt5XYnugFDY1bg7Rq76wWemHjPE9DOo4MkvWu3xo0/u3z3Y0GpXIy9ptV2vveQQo67JRx3BtO2HCvNMIdDUasKmOkKzcMNThrATCGecsZyHLE7+flerXxIxOxvHh9DPaoBwHd2gHTdA3nCIqh+LQBTFA3XEkECIzyrVszpC4YUTCSrS/+DAMdPPc16Tkx/BwL6kA3fAcqnXBNV3V48Prsd4WNdecmOUhGliQs9Lo4GOUF64w5WCqJURmoUNwuNhSX9k9fqvI2HB4eeNmnZZSRyW8ATEev0GhBzi70I9WD3/tZtkSQA4WV8UXUljVEaY8M+qJMgD23ToB4E/tHk1SPS2pu1cvnlTqy2StnZDwcCov3IrlWR/BL7jc28s1mmhg6o0YlWEhV9PaBcqMO77wzGluWDb37V65/LNa7WLVN+6qeh2/d0vXPUHupn1JpMcjBsfCTWLq5inVREKe41EzMltW07MOEWUe0snz7T6xuV7tzqXED6ecunWVTbPWkNrPCcS8T0UZ2wUuag/jMt4QYU4eFWEDm/CsE8nPcui5jC0bT5oSH5u1A4+ubf5+FIT/lBeAAXYvsLuaYFa/Mj7QI764QidU9yzE8Ezcvf2Na2I0BZNGHjxaS9FXuh1TV9ABlvtCg5cv9gN6ytghzY6a2ivfjXHgrR5wruianuZO0QI922rEN3B7ataEWFeWPwm656jZJiSoc1PnDzR6lfZoluXBM0W2n0MMnW3weF+wtRAB1rjJ24w9XSjZ02Y7jM0KNTv7ccyqiFkxXASoaDl0+G5URjc5Ke32vaV92/WFxFurxfaozx5+GkrrtS1p8JApQPVTwIE1oxbNQheDaEujAwyRDmik6GKR6mw4H7T6le7u6v7FyBqF47qjU8f2Kg3fuZ636GOGrkJ0vXCpCf+re3vagjzUj3pjjnoYzem5/ztPzXqx9c8sNauXU/apwbAmiYakTgZs/w3E9ZLTCHboGvetq7VEAofB5rwjRObZmwj+5QDBk2xct0TK9qtEHJhIzSGhcyRabKhk+nCcsO39jAqIYw5k4ZOqsuBjuzQpiKsGzbqm9c/s389wvoVCLc07TfetVUL+WNQToFryuf8hHPbylZCyKOYxO3mGXlDLclnYvQX/+u6XijouH49wqtcxqN6Q1jgEzQc+sz138dvRGhRuW2NKyHk1guYwQMauqkavaZ/CFXxUvvuhmdWr2dTrX3F/Q9BJ/JiQ9bvqUNrAoaFQKjeNppRCeFU+bIsibDjUz76Tp6/q3/q9c5p5/o2BGl69GkH/k57JWxRQIhxkjMTeUqVjlgFIRW6QkGjMeoqSh6iCW/TJ5p2k0G9ewPC2ices3jgnfCF4+45xqAScySmMdy6I1ZBmAmpZjBTHVEy6HuxFHEmrV/FbDPauxnhp6bQel37F0CKemaURDkLu6gv9AW+ZW2rIEwKjxvZlo+y0yGi41CSXlxVywVq36AugK6whfa1pycSObPRiCRs7OulFr5tuKYKQvEtoR8G1kfqJjHi0xHI3zcoQ8SdvhsBXhWfAmkKHoY8RGY2oe8TiXpylQB/FYRc3xO5h4yJG6Oeh0ih7ms3xCZQ40aANW3/00eaQulL6oi9oeh9T/VsFVfwoKoglLk9MxkgQzozBx90anBd8aqU+ddIm5sB1moLtsK0hHVN+xcglP9AHyJz7KiprQ7C2zv6FRBSWYzopWiipKkTZsLC+fi2flhcPrqyKVtXc2mjfVDXwBJfkKW7s+cPtGfQaPgPpLqB7Rs0Y0kFq6YCQlsp4162kU0+GHGsCMepvldcXtu+Ms50BURtE8Csrq2vbh3PhNTqwmDV99rv4AfjP1EYOSnwDNINMQx17wgLE5iLtCwLJlgoYvJXbWay7WlXDVig9e1PxMunomlreyFOt6G9FREplCtn73UemMUV1EUFhIWnpuq6jayh2kWBD9X4UZtbl8dFQPgyt16KZVzSLqucT7caizJ1VwjTMLRNHABrWqicfnK76lZAWMxVUylVzO6/E2TqUaEsZohWG3VoidVP1KMYtgAqEV6Mqh52uIt1QaTu1Rv84yUUxZMzBH5wQApT41bVrYAwLQJ7LM5PaYwo4jEo7ljM72jW6x209kmMCRDWOysPW4U3fNFMbz1uoZ1LYSwwZXm0Bpxek9nZJCsGEiT1diHFKgiL+SUodSc2SnUxmeDkiSaaR9DjjaN6/XDt8fHu4/qctCY0XqP5uL5xKNj17cr3s8uPm436+i58l4P64hO1GleIioU+IBQkb6bcc+8Ii1G1P5GL8x5yY1McPoE2XJ3Tdq2+CQ22eoE24Susra7yuH2d+0zzKzzsv1EHw+bC/dCGHCGoeJfG/b7BaJVRtgoIxRwh2UIRtgI0zKYIa3NBom2XdnZnQbho+9CIjaam7R7ttzcO4PdOeVVrF47H/p62eH9tuzZF+CZOz18otmmQL8OlwCt+mADCM4u9Hsd8EJq34erK+ozWjjSh8NbWF2htu9ZYhb9bfE7UYb3eml5YEQC11uLN61trnbqImkoDFo5iC6sxNbifdv8IwQAmThogywCvze+mHu+Wv2j1zu7B9v72vqCDHRGXqT/aLE8Abe8e1htNuGd/G6jVfrxXXDzoFPd2Nhbu3W63Ng9qNZBiOE/omwRlhoS8vgWyRr13WZpBbwjNXhflI5Q4YzF8ybXFztrqSqu1Iqi10izaZX12aqW1DuJ/FQ7hRKu1unrUXuMHrbUjfmt9Y312Jz+5urICfPBRaHhzGDHWi2lgcgfq/vUhD5fIHrKhw3cj1xZaivyl1fbb69Aq3xe0fcj71na9/Wh6BqipHbTKw+3WEWqJg81HRSfcWbhxe3f1cPv7Ru3tSSFZPrgOsKbOWPhFbBpul5LQRF00HuYfimEo8hxMlFars7PaFO0CtP5dTTtsPt7dak1pa0c01PSouLICps4ONOFOcZZfb66td/iVtvaqRJg5icNGFPWEwXjvCIUCxAFL+xTei/S+XAz9Ntrf7x7twrdv7vN2aIOtfdRpPt77vl22TGu7vt6eNdPhTov/6bQPWmAh7B6Kk53D7/e3Dx9t7G3DjUXIVDKojtLQHPtorFYYf6qAkBV6N6XKa+jzdNTPRJhGaz+E775/hJoP14pW3K0frzf3tnmz8tYBP39z3oStZhPON4Eb4d/6pniiiVaaza3VzXaLP7JT44EakuQ2n+lh+QkSrgUe3DtCJIw2uUuJP0Lsg824qMG/abX25ubmitbu7G504Ndmu7m5uds+bB1tiKPWJniBR5uXqNPeOoaeuM6fbe9u7LSPOrW2ONrc17S/uEHIHnzQEYv6fxQIv4SP/1rMM+tS7HZRclZ2xF80rbOzs7O3V99e391fbe7wg/YK/NNZ5wctYNrNlZ1LtLbZ3NtpHXX2+N2rh2DyHNb3d/jRTrOI00iGibzXsSmd/cEKhLdcK1Qp1sZ7R/8DUzyzF1Bk8jmg5CewpY+AdjrQ/ertzgb87ux04N/dNX7QbNcPtnaPLtDGbmcN/jxq7fGj3aPHG839+sH6YXG1VhOCBpsmcvs6jbJ0yIctbzurpgpC4fK6JhvpyRl0kdQSQf23tfZeB2hvg49db67y3zvr/N9H663O3nq91m7trqPOArXWdh7xP+LfLdAaIH5re4+Ki48aZVg/zhANQKohMxUC4JYjiFUQisCM8gcfCnYoormYrnfyTNOOdjmtcWe+vtnhv1vizKOV3b3DurbR+qF5uLc7ox9WV8XfnUf8nt3SdNspLj5q195xq5T4eoKQy2cgC8ObvLllbSuNWxQzgxlFyYcYnf9hiTf//E47fMRpd0cYYUdbj2a0u7tar2kbD1ug6OZnV/d2i4vwT6uw1eud2dXvtH3BpJL9xmRnlo1oV4xj3HacuxJCIVoM9ib1GCjj7DzmMeKTt9pBwV9NMQpTP9pbYEhhxK2sgVkwP7W2yLElwPXycO+HYuwJ227s9sGeSZKRq1QQNNUQcg/RcUb5uY9pNKRUaEhg09rhD4IeFZbmo9YPU2ryzrm5urfV3J2e2uvMrv6wV1ix9cPZ1R82axp3LMBLM4d9LzeS0AzcsMIczEoIbVVIGqq4iTUEB0NMxCQvGtp+qQRWN0E17D/e3ZtqhS0RaNMeLyiK9YXfncf1Bm/11dkDHU37XcwRskyUuv7oPLQYGocVpipUQsi4IiZgLhrWcGAhB52KwP6v2sHRhqDjvYP6Uev48V6nPF4vw2t7hxslHW3M6FGzfrCzqdU3Hx3Pzh3XhLqXcDzyQBdmqgviRq3QDSvOVODTd7CD0Mgbvtazc1ZMWHquae3SJAOn9mAdNQ8eNYXJ9rDgQnCJ15uty9Ts1A9XV+FZND+3o2mvytkl2QdEBlnChNdWYQ1UNYTFy1LoEnlgJ64uglMSearVNtsFbezWd/bbj46bG+KweVDMqAHnYr99kY6a+53j9t7j/c7iWU37UYxwnbK+gz7m8Ca9mEp367l71RCaxTS6QM9obLuOXiylJM8btf2Vh+sPHz5cX0GbOw9XVhC0IRw9XJ2OPtXBy33IbxC3PXy40trpIDjY1da2Hs5op5xGC46E6Q9ZF+lZN48qmN2VERZsmgySyEjQeUTfF9PcuPm9fVBQYw/8IqC9VTjzfWsXtUo+bTYOFmh7rdluHDSOwF9aOHlQE1OihM3mBoxiI/FHFRfqVUQopn2FNOw6hp7kcZlNiLx4W9OaZSRiHa2LgMTqGvzeOzw6bPHgVKO+vrJIPFoBtNVaWzgJ9s9vJ0WJuBf/G2Fp7HjCNrz9pK+qCJmYnJCYw/Peeczy2Cvi4Cd/a7XGdkEHm50D8be9u33QaTV3oOLclV9pb89pZ1Pc01gv/pZUq70tpwaempZt6/2kn8XCoamw5qLqDFrR85TcpNmIZSViDvFXrX60UgrElfKflfLEWoePhK4uiNH16a1r09gHp21wDEu2h6Jjm6a2OSommlVYclEVIRU1UKTEjmNGdT0pl7qGL6ErXkPtdS5MV8Cjah9cd8/29v5BTXtW8Kjk2xmUblPPUYvVQhVqWnmufm82pm6OPvZH05QdXJ7W9lauprUdPvHyGFyOrWvugC57CKpwuvo50vPwnOsHKrgWV8kFUhlhXCzCHqFRPx2ovjutFF8xUztoXEngP7XFAI629f3Vd4BY1bS3s0wMEZScOgliYlzt9rP27oSwXB/gMDfoj92FBCYnT97VDlbWrqP1VpsvD1pHV18GH+Pgp3lhsp9Y6vnIK4Zk9C+LsFiiG/atQLHy4UKGhJNn76Chato1tL3+HVeMzfoV1/hzjZ8XMoVFCRSfkmE5g+fLIix6IgjwBPvjC2mE+Nyag9bWdbTKV6nvrl1xZW0XHvzrZKEocp5jYhfqttqyp7sgZMW3hi4o9xK8WC3yjLfG/ndX0v7e0dHO5toVV/jK9bc/XyjJSbHkD4r5bBXXyd5lhWW3UPNimLZ3IZHHyb8aNe1wwdC8SCsPV644C1JIe/n8QjK7KONCp9SNFdc632kd8GQO61K2K7FMtq4dHy9Gf483jxd/wL+zy8fHwLq1d79fzmczP1bHFSt5J4T2hQxCirLw/fGL30FrHIng/WdQq9kGq/yJNAeoXMz8RoKqaRXuth4/WUhAo6S6u3BIyBORL2Jz45/paBva+93LhS5IcGo7i9+v0sK8JSAsNHFRBcJsOl5MuXPy0+/vwBB/xEP9N9HOzga0X+PZQgOC9TLyUH8OUa6eE+uOWSPi6WcH1T9SJdO5wFknP74Uk1D2jw6vo6ONGs/90Xj606KSwLk90EdziLhfvYp3zW1SxC8k0kddVR2y04tJg7H0y0s+v6K9K+L0F0nERQ8bfNbF7z+fLD4nqxYd22dWOQlKItVzRiwhP01pcocDWekhi/T6F3OXnoR/F/lbgLY3Nw4Pi5g9tN1mo5gWpL397fkFfCTq5jg2UV/NwxKxfocK3hnhNDUHxmPUU3WTLUqfooM+f/aqUcyU2W8fb4hBp832AQ9pALynf784uaQiqA3up4fMsPxYaoV1lUtEOE1RI0lmXyYOsGthY0XzLI/kJPzpydO3RZaoOm9Q8etd49VvP764nOgbKz1qOCg3Bll5Rjm/U/2WkAmrWGcNklCsU9JjIwxlSRkl7gK/EkzCn3588tvTVy/f7u+/ffn7r7/96+cX4eWcZlDEn4HPIrWH3OkXquT2LhchiudSXU0ZX9RiKXgQo0sZBQnGM0Q8u9kFdDKJgBeIw2IUhFw7ZCVA2blj6uSl5NyzpxIU0E1kxs7MDBuj0SLCq7POz9suo4gSotKhkQqekMvejO8KcEl5E/UpxNhVcy9naSAHaNHGJJFzE0TcY6Nu6ILaizE2u3NZdXeAy8p9aZcGiUxU0/ojzhQl9lRSZM4QNfXsueD5FKHsZW9AvAQkp6naRzNLCffvnt17WflL42jabzKmg5wfIoL7LvSsQOg0UCVZsWxJioLLEKFP4h61jJGuhtTsK26pBiXFXUL68qXloKXBFKIV9zGmljqhcQ96llithAe9kk1xTi+lU5YneSDbCZtM0CSI9WRmFt01Y2JBy8sjzIZlzTGwZ4/pagAI0wmSeG46ZTztldhd8Lk4H8sWaHhpYNPMyHTDSmfX5LvlS5zSMnNBW7PNEJQsYZiLjzi1CaWT8COSZOE+YqzKgi9Bdcqkb8k4Z44Rj1UfTE+GotmGAzhcUkrvpebz1qVpXHgCzMYXmcVs6I70njcwjVTPob+5OU0Uuf+nj0+pB7LTwLk5MnLTsKz43D2du/RLkDEFLTcnu+mWnjlRMIkYS5CpEg95NB2l1EJuxGIdJWC92ojnEHJkFGK1x0KMgojG4awHYrwcDuW07Lz63tRcBikauz3UxdBQzKR/JEOD9objbHRuvjFDg+ZBjAaGmQanMXUNPVHVebZspX+XZJeXaOl7I5i9afybKLJrTojcRSlFAfRC872RxXpshgHBsaUYo9RBduwAQjVM5jpEDpfXgOhe9rew+7MYP2c7PDIJRdysMU9VFFuIygTbtCvLickyGuPh+8gL4nIljgSiZ7n7I93LHiWjyWIi9ihQU7Cj+ZC8ynKd8tw2ppfKZEhz5T20p/LnCNRhqWkGS2RQQfe0z0zmL2yjA34V75xRHmJXD7oJBjvUiwp1WFjkLlg8Ap+7bHz3uFeQ/tq4vBcL8CxWiv0P8MVoKGAmRFby5eO71/2eaC79425Ws2aWcZDex15I971nlz4I5X8ESUB5Tqx72s/q/vddY3YeAILrYIKYkaPh+N7goS+zdx7fOs8He1REMUqC37KiSM6gG9/z5nlfZHdAIEb57oeDoTPxgSaO20vGI2reT9e7QF8K4YyYoC/4wi+O8IvTN4RfP31D+PXT8vZ7su0vKSE/nz4bIbtZMTPHMO4en74P+iyEDkVmIN0YvcyM2DZunjr4II7vw3f4J/oshAZO+F5MN80WyAwd/o+8G2aaJ4r65y1rd5HikV6BSz4LoQruHOYZ2q4n5ihqmPUN43oj2pJvn9ZxgbzQUFW1dz+rEeJAjTxJMm66hzlEUtWbNti8E0J9osq+C26KnNwS42dKmjQ2r1rqb5qz101UBfdHIJCutaYtufrum4lKyBllZuYTfMsUpp8tS+kVCNlHMktS4TkWlyMBxvo1JVhhWBnhnyp4W4YBXxFj43YJ2+6GMCTqpQICcv3UkDu4FN6gN6PBl2zDULoFwmToAht/cRIVpKNsNLdIYjiaKi6TX6GImnOEcEpcNQuEpjgjBAxvoylCXuRc6kCRWVfBcn/+Bnv2gnj6S9cXa3axUnpWPhDr+rRyzF58ianPChW3jTLdLBF6kSqrsiLnorgslBVFVgNRjKvCb/gfaDpKCoRdWVXEfnY5LRGOFDjDp4R0R1OE9kQ8GIk3shxDgXzr1Ui8wQsVFQ4xV6+zZ3n2N3UhExtUSgEqKxVL8Lt4eqgaRdDf7CmCQsEXtA/vU5RiY0/qYkUBSCof/3gQBwpWSEgwEfM6UoOIAArm5TkyH3zAhCgzhLFCooioUGpoFVxqqiT0CZ+35LglQl3hgRiF7wMFTxCZyDLmEVIBKlElEbHhQ7z82RekmBxrq8SftUAAkoVXqpxsEmHJJ4qYBg2VFyhSXiYfpSJ857kHEiYKf4XBvy+cxGEEpzBU4FQlkuNRRruEb/rDsIRd3bYwz2brQR2HWdo7nfjxlEstFaoRygM+e7ZAyKckoj4woGmEZoEwINjR7bTYy0siJEziOPYCzN8fq3zmIeVbRWCWTZ+9iLAPukFUKiVi5zxqYBv1sDJHGEvwbXq2acYufKsHqCeTKLOzCSGvEfMJCWyeITfkq/lUSSLF6ugEw+FIJaf8oIdxzpdsRyaPqnCtVyJM1AkfqXXhDtBLgJCNVAA2xD7q8ndzhFSVxMY+XZkMUWLIvoli2+SbJwGGBBcLXfnX0UcK3DjEk0sIeeixZ88qVSAEXmczhPBZJd8SbBtKsg2gxEz+GIPhZat8HSbfpQaaKASTc5pM0pPFvkbF9AAQCz3EhxaiMIygwfUpQlvFp6eEuAhU74AjfEBVEvQJ1M7nczAdQKgb8nskOhlxkJUkNnQqFQ8YvN9gjloadi6Rs9mzFxGqwFiFFSwqhRB0miFYjQsIjbIP8Mnmsk2xLPLyQFcyUKpAzVLQnjmfe4TsXvlNi8JGg0FWyBPcM3nEFkxBteiHpSwF+xl650Ck4TGFtkhBWkjk33yKBTZPAWE8GIjZhMAQYh2PpfJxe7lvRpJKu0lpdgFCjz+rSp8gpPaQ4EWEusTHTxcQstibrmTjCM3BoDdDKOouO9RV+Nw/tArHCwinJO6Ct0+8zMsiaQEhMrMcWIfPIcFpJPShObIUEvD1evJ4uKAPS4TANcrAhX+6wWKerqKq4tnLCMGGwRcQIqZ3LyCEB6fbIoKtOlMSAqEHnSM1LHB3uhzhg+sRzg6CBVkq7lRI35f4iKBTWm2xSoY+D2U7zqcIoU4pb3viR4tGw7SqsXoFwj8uIUSmfQkhm7fhJYRQUHBGyHmEdfI5CKEPSWUbSgpOmLhTAinFdw2Z2jS8c0vkg0tIJF1GyJfWhG88VOxxVF7SJ9wb8xaR8fnUUY9XGrRpqVlmXEoMqIVMZwiTE3kB4eyNAiG8ECQHUSKx/84/IvQMfIJLhITIfOE/EhmL1SITe9GGYssSPEXy3+IAAAeKSURBVBJrZS8jBPVAVGx4fD4e6U+vcGW2iJDy+UZYlUEKxqAL8QWEIJDEUCoZlQhzlQ9pXcOlIm2HmNwffw5CR3Zpwv0FCrqRgotHS4R+kcRl1oY83ZHIHnEZISAY6n38gq91m7pPjtyPEyzPEaZCe7vdELT/QA6oJ8sLCC3Zj2OeQ5TPrAWEDMsWHeIZwottCJ0Y+INbOp/ThiwEzR8XCKE3mapSIuTOLJ/+PEcIuk+sSbyMkBqgqnRZ4gP1SjnLwgdwVJWz8ll/KOYxAj8kgKHP7QQsj+eVyuVTjoTIEg4AUGYa2ORcbV7dhpyVRIKQSwjTK9uwj4PUIVAgCuQo/YB5TgOOkLuhFl7kUj4Fimdr/0TShNiNXcXnzKOUvkUfT7KhLPpV8XWInGQqTmxf5fPhw9Qt/dwCoaeSAV8hl4qJxbwN8bAblYLpE0kjmEuItAKhpSoFllRV5jOqu9OzusJtY85cGbfPxbR5D4xavjAeTA1sFG0Iv3h2I5PPW5sjNJRA3A4qFNzWHvTGsi42N8WN4g3iWTALwRYA4xnahYISlktzHF7l8l2juVkNHUTYq3xHSV4Xo/hcvjJ/I4UKQS1ULH/kh8B8BD3Ihm4x2V8funMXPBuelWvF4txxC6fa7jkDvbzzTDxz7rrDQlvAGcEJFpyZ+TP2sDg5GgZn8KB3Nr9Ge5N+ybHwbPFiM5eKOI+ZOP1yUF8f8kxU4J5EhZhl/AU6Hz53euXXys+GszY0z3i2HhNKFC+mZ677XxzVX1Zs9b8VoacaMjSNaRh3WPIk6L8UoakElhTwbSTx+zsW9V+KkIJd6agCYeVtckv6L0XIQgJeyv8yQkRz8Gy5Ufs/i5DvE0KCAFyY/9F+CMQjZLKM1f9RWbpE+obw66cHzCyGyExzOlTGKOURezFKBv/CX/FTXIVrbHqtuP3CcItZllIWND3kj82uMnF6Vop4GSrPTuswH7QrfxYvnN7Eyhqj2fMLZZqXCnrQDUMp6lPkRKEUnoLhqwdYDS1kFwFqaeT3UBjxaOdrfk2WJzry+AiaGfEV1sz5sABQJI8g1JOELTwO+RIth2/MrOI+z64YRSFOLDgdTlKk4wwxFxt8ggB2UxxG8PQZsbgTNMu1Q0PurzHu4ZkkH4mb8GjII+EOeE82H3qG5xNeZtCFWo8cEgIUf/gRsHRxyr2nZNwDL8ePxuMEhyhWwjQbGgmLuINEAioNEJbB0TmdgOPle6lkmB6PnacqH75g0WQBodrvjsdjM+XXeRQxgSMPecYws1TfHHcD1RrbiZp0x5FMdcNDcGI0BPvF6MdjS/K7YxqAkzScj5VbKg96M+5pmcY5HY+jEG5yeN0mEnhLpDtyjRzlRjK2fIXaRuZ1z1W32+WLieGLA5daBuWSGfn8s71WWE+4nj5hObzGNiyTI+QBtH4ALjxv45wKhIHfDxkgDBYRFv7XFGHhPDKf18eyoC0GfKA8UcX4iA4IbQMeYL0McfuahVwx2KqrG7P0jyzqB9EUocqXPAf8izr8n0ACYPxFfWwmhinKtA2+x7QYu0kML+H+KLThiGbQdr7veZYKbSmSvllGHMPbc5UKhH1oKUA4Dfd5YvyhOwK39iJCZXLmnvVmCJXhmftBN9VZYNLlO6gkStfzImzqRlbeiARCUyCEdy7klYd7ulDNOUK+hg8QSq47CEPkFKMHBvDF2Et9bC4gZBEWcYoHlmIYBvQrPkCu9lhZY14scAEOEEcon8NDwwDhF3OEuUEZX/BzAaEcBUHQnyOcgFWSmcYlhJgoqkMRfCBr6vQvIGT+Qj4oVzIp2G0lQneGEMydQApZIJoDXgdlqmqfM90MIdKL8Thow9S2TSg3YB4PYziEC6GeHEMzW3CraEMXDUOA8oZ/MtplgBC+UBQRHN/MpcVQqjC8RhmbIjQolUB2QftkYky+ay8ihJsWmEKM5TGmFv1whlBwaYiGPIAEBca8TBLRCwhZkUYSEBa92oea9qDPd42cAfyA8XxlUIBoQxfEG7Rn17AYAzGQGfZIdfO8B4iigM1mZJhqLg5SY8QFOrC6kNquokMxsjlFyEdVQQ5APzTVwASOGFxEOA+Md9VBnrtqF0lwX8YHa0qEvO2gH6ZGj9fT5xwF5fWvRljKrTAQsUMKtYgCQ+InJ6rDW8BF6gfeIBME6PzQEP2sL0LsvkQjHIZCmyAeueUHxE4NCf50LQOOPkaIRipoIP7WM46Q1wbeknJZ6qlSwEfnDP4m8lqUMpy3YTFKB1ICinIwj82xKOLNx/nvjcxFVxSofOiNl9kzUpuDGxUIC95BD+xyKCjlZ+1khFCW9yxxTrf4OOM4QxbPjGhxqZ3lf8IdcRJbIpqrJ7RrAY0LtW9agmgs/ti2+NOF8908Ed+Rp5KFh7hNkKSUn4uTfAwSN+HjSd1iIDObBcRYImJgGVRnlPcSOqtnygNVqRgmz3M+y6Uo0yrKpMXLmCWe/n9gtf2nK3Dv9A3h10/fEH799A3h10/fEH799A3h10/fEH799A3h10/fEH799A3h10/fEH799A3h10/fEH799A3h10/fEH799A3hV0//B9CitbsXK73BAAAAAElFTkSuQmCC"><div><div class="org">การไฟฟ้าส่วนภูมิภาค · PEA</div><h1>เช็คมิเตอร์ด้วยการสแกนบาร์โค้ด</h1><div class="sub">ระบบตรวจนับมิเตอร์ไฟฟ้า</div></div><svg class="mascot" viewBox="0 0 70 84" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M10 40q-8-2-5-13" fill="none" stroke="#2a0a47" stroke-width="3" stroke-linecap="round"/><path d="M60 40q8-2 5-13" fill="none" stroke="#2a0a47" stroke-width="3" stroke-linecap="round"/><rect x="11" y="6" width="48" height="62" rx="10" fill="#fff" stroke="#2a0a47" stroke-width="3"/><rect x="17" y="13" width="36" height="22" rx="4" fill="#bfe3a8" stroke="#2a0a47" stroke-width="2"/><circle cx="28" cy="21" r="2.5" fill="#2a0a47"/><circle cx="42" cy="21" r="2.5" fill="#2a0a47"/><path d="M28 27q7 6 14 0" fill="none" stroke="#2a0a47" stroke-width="2.5" stroke-linecap="round"/><circle cx="35" cy="46" r="7" fill="#f2b705" stroke="#2a0a47" stroke-width="2"/><path d="M36 41l-5 6h3l-1 5 5-6h-3z" fill="#2a0a47"/><rect x="19" y="57" width="32" height="6" rx="3" fill="#8a3fb5"/><rect x="21" y="68" width="8" height="11" rx="2" fill="#2a0a47"/><rect x="41" y="68" width="8" height="11" rx="2" fill="#2a0a47"/></svg></header>
+<div class="mtabs" id="modes"><button data-m="check" class="on"><span>🔍</span>ตรวจเทียบ</button><button data-m="new"><span>📥</span>รับเข้าใหม่</button><button data-m="merge"><span>🧩</span>รวมไฟล์</button></div>
+<button id="manBtn" class="sec" style="width:100%;margin:-4px 0 12px">📖 คู่มือการใช้งาน</button>
+<div class="card hide" id="man">
+<h2>📖 คู่มือการใช้งาน</h2>
+<details class="man" open><summary>🔍 ตรวจเทียบไฟล์ (เช็คว่ามิเตอร์ครบไหม)</summary><ol>
+<li>กดแท็บ <b>🔍 ตรวจเทียบ</b></li>
+<li>กด “เลือกไฟล์” แล้วเลือกไฟล์ Excel รายการมิเตอร์ (แถวแรกควรเป็นหัวตาราง)</li>
+<li>ตรวจว่าโปรแกรมเลือกคอลัมน์ <b>เลขมิเตอร์ / ยี่ห้อ / รุ่น</b> ถูกหรือไม่ แล้วกด “ใช้รายการนี้”</li>
+<li>กด <b>📷 เปิดกล้องสแกน</b> แล้วส่องบาร์โค้ดหน้ามิเตอร์ทีละเครื่อง</li>
+<li>ป้ายผล: ✅ พบในรายการ · ⚠️ สแกนซ้ำ · ❌ ไม่อยู่ในรายการ</li>
+<li>ดูผลด้านล่าง: แท็บ <b>❌ ขาด</b> คือเครื่องที่ยังไม่เจอ กด “คัดลอกสรุป” ส่งเข้าไลน์ได้</li>
+</ol></details>
+<details class="man"><summary>📥 รับเข้าใหม่ (สแกนแล้วสร้างไฟล์ Excel)</summary><ol>
+<li>กดแท็บ <b>📥 รับเข้าใหม่</b> (ไม่ต้องใช้ไฟล์ Excel)</li>
+<li>ใส่ <b>ยี่ห้อและรุ่น</b> ครั้งเดียว โปรแกรมใส่ให้ทุกเครื่องที่สแกนต่อ เปลี่ยนรุ่นก็แก้ช่องแล้วสแกนต่อ</li>
+<li>เลือก <b>ประเภท</b> (1P2W = 1 เฟส 2 สาย, 3P4W = 3 เฟส 4 สาย) และ <b>ขนาด</b> (5(15), 15(45), 30(100), 5(100)) ด้วย เลือกครั้งเดียวใช้กับทุกเครื่องที่สแกนต่อ</li>
+<li>ตั้ง <b>🎯 เป้าหมาย</b> เช่น 100 แถบจะเดินตามที่สแกน</li>
+<li>สแกนทีละเครื่อง เลขซ้ำจะเตือนและไม่เก็บซ้ำ สแกนผิดกด “ลบตัวล่าสุด”</li>
+<li>เสร็จแล้วกด <b>ส่งออก Excel</b> (ระบบจะถามยืนยัน กดอนุญาต) หรือ “คัดลอกรายการ” ไปวางใน Excel</li>
+<li>จะเริ่มชุดใหม่ กด “เริ่มรายการใหม่” สองครั้ง</li>
+</ol></details>
+<details class="man"><summary>🧩 รวมไฟล์ (รวมจากหลายเครื่อง)</summary><ol>
+<li>แต่ละคนสแกนในโหมดรับเข้าใหม่ แล้วส่งออก Excel ส่งเข้าไลน์กลุ่ม</li>
+<li>คนรวมเก็บไฟล์ทั้งหมดไว้ในมือถือ แล้วกดแท็บ <b>🧩 รวมไฟล์</b></li>
+<li>เลือกไฟล์ <b>หลายไฟล์พร้อมกัน</b> โปรแกรมจะรวม ตัดเลขซ้ำ และบอกจำนวนไฟล์ / เครื่อง / ที่ซ้ำ</li>
+<li>ถ้าเลขเดียวกันแต่ยี่ห้อหรือรุ่นไม่ตรงกัน จะมีแจ้งเตือน ให้ตรวจเลขเหล่านั้นอีกที</li>
+<li>กด <b>ส่งออก Excel</b> ได้ไฟล์รวมเป็นไฟล์เดียว</li>
+</ol></details>
+<details class="man"><summary>📲 ทำไอคอนบนหน้าจอมือถือ</summary><ol>
+<li>เปิดลิงก์ของหน้านี้ใน Chrome (Android) หรือ Safari (iPhone)</li>
+<li>Android: กดจุดสามจุดมุมขวาบน แล้วเลือก “เพิ่มลงในหน้าจอหลัก” · iPhone: ปุ่มแชร์ แล้วเลือก “เพิ่มไปยังหน้าจอโฮม”</li>
+</ol></details>
+<details class="man"><summary>🛠️ แก้ปัญหา</summary><ul>
+<li><b>กล้องไม่เปิด:</b> กด “อนุญาต” ให้เบราว์เซอร์ใช้กล้อง ถ้าเคยกดไม่อนุญาต แตะไอคอนแม่กุญแจข้างช่องที่อยู่แล้วเปิดสิทธิ์กล้อง และไม่ควรเปิดจากไฟล์ที่เซฟไว้ (content://) ถ้ายังไม่ได้ ใช้ปุ่ม 🖼️ ถ่ายรูปบาร์โค้ด หรือพิมพ์เลขเอง</li>
+<li><b>สแกนไม่ติด:</b> ถ่ายใกล้ ๆ ตรง ๆ ไม่เอียง หลีกแสงสะท้อน เล็งเฉพาะบาร์โค้ด (ไม่ใช่เลขสัญญาหรือคิวอาร์)</li>
+<li><b>สแกนแล้วขึ้น ❌ ทั้งที่มีในไฟล์:</b> อาจเลือกคอลัมน์เลขมิเตอร์ผิด ลองติ๊ก “โหมดทดสอบ” แล้วสแกน จะเห็นข้อความจริงในโค้ด (ทดสอบเสร็จอย่าลืมเอาติ๊กออก)</li>
+<li><b>เสียงไม่ดัง:</b> เช็กว่ามือถือไม่ได้อยู่ในโหมดเงียบ และติ๊ก 🔊 เสียงเตือนไว้</li>
+<li><b>ส่งออกไม่ได้:</b> กดอนุญาตตอนระบบถาม หรือใช้ “คัดลอกรายการ” ไปวางใน Excel แทน</li>
+<li><b>ปุ่มล้างข้อมูล:</b> ต้องกดสองครั้งกันพลาด “ล้างผลสแกน” ล้างเฉพาะที่สแกน · “ล้างรายการที่โหลด” ล้างรวมรายการจากไฟล์ Excel</li>
+</ul></details>
+<details class="man"><summary>💾 ข้อมูลเก็บไว้ที่ไหน</summary><ul>
+<li>ข้อมูลและผลสแกนเก็บใน <b>มือถือเครื่องนี้เท่านั้น</b> ปิดแล้วเปิดใหม่ยังอยู่</li>
+<li>ถ้าล้างข้อมูลเบราว์เซอร์ ข้อมูลจะหาย ควร <b>ส่งออก Excel เก็บไว้</b> หลังสแกนเสร็จทุกครั้ง</li>
+<li>ทุกคนที่มีลิงก์เปิดใช้ได้ ไม่ต้องสมัครหรือล็อกอิน และข้อมูลของแต่ละคนแยกกันอยู่ในมือถือของตัวเอง</li>
+</ul></details>
+</div>
+
+<div class="card" id="c1">
+<h2>1) โหลดไฟล์ Excel รายการมิเตอร์</h2>
+<input type="file" id="file" accept=".xlsx,.xls,.csv">
+<div id="cols" class="hide" style="margin-top:10px">
+<label style="display:flex;align-items:center;gap:8px;font-size:15px;color:var(--tx);margin-bottom:8px"><input type="checkbox" id="hh" checked style="width:20px;height:20px"> แถวแรกเป็นหัวตาราง</label>
+<div class="row">
+<div><label>คอลัมน์เลขมิเตอร์</label><select id="cSn"></select></div>
+<div><label>ยี่ห้อ</label><select id="cBr"></select></div>
+<div><label>รุ่น</label><select id="cMd"></select></div>
+<div><label>ประเภท</label><select id="cTp"></select></div>
+<div><label>ขนาด</label><select id="cSz"></select></div>
+</div>
+<button id="apply" style="margin-top:10px;width:100%">ใช้รายการนี้</button>
+</div>
+<div id="info" style="color:var(--mu);margin-top:6px"></div>
+</div>
+
+<div class="card" id="c2">
+<h2>2) สแกนมิเตอร์</h2>
+<div class="row">
+<button id="start" class="big">📷 เปิดกล้องสแกน</button>
+<button id="stop" class="sec hide">ปิดกล้อง</button>
+</div>
+<div id="reader"></div>
+<div class="row" style="margin-top:8px">
+<label id="photoLbl" class="sec" style="display:block;text-align:center;padding:18px;font-size:18px;border:2px solid var(--ac);border-radius:14px;color:var(--ac);font-weight:700">🖼️ ถ่ายรูปบาร์โค้ด
+<input type="file" id="photo" accept="image/*" capture="environment" class="hide"></label>
+</div>
+<div class="row" style="margin-top:8px">
+<input type="text" id="manual" inputmode="text" autocapitalize="characters" autocomplete="off" placeholder="ต่อเครื่องสแกนแล้วยิงได้เลย หรือพิมพ์เลขที่นี่">
+<button id="add" style="flex:0 0 80px;min-width:80px">เพิ่ม</button>
+</div>
+<label style="display:flex;align-items:center;gap:8px;margin-top:10px;font-size:15px;color:var(--tx)"><input type="checkbox" id="test" style="width:20px;height:20px"> โหมดทดสอบ: แสดงข้อความดิบในโค้ด (ไม่นับผล)</label>
+<label style="display:flex;align-items:center;gap:8px;margin-top:6px;font-size:15px;color:var(--tx)"><input type="checkbox" id="snd" checked style="width:20px;height:20px"> 🔊 เสียงเตือนตอนสแกน</label>
+<label style="display:flex;align-items:center;gap:8px;margin-top:10px;font-size:15px;color:var(--tx)"><input type="checkbox" id="scn" style="width:20px;height:20px"> 🔫 ใช้เครื่องยิงบาร์โค้ด (ซ่อนปุ่มกล้อง)</label>
+<div id="ready" class="hide" style="margin-top:10px;padding:16px;border-radius:14px;text-align:center;font-weight:800;font-size:20px;background:rgba(26,127,75,.15);color:var(--ok)">🟢 พร้อมยิง<br><span style="font-size:14px;font-weight:500">ยิงบาร์โค้ดหน้ามิเตอร์ได้เลย ไม่ต้องกดอะไรก่อน</span></div>
+<div id="raw" class="card hide" style="margin:8px 0 0"></div>
+<div id="msg"></div>
+<textarea id="tbox" class="hide" readonly rows="6" style="width:100%;margin-top:8px;box-sizing:border-box;border-radius:12px;padding:10px;font:14px monospace"></textarea>
+</div>
+
+<div class="card" id="c3">
+<h2>3) ผลการตรวจ</h2>
+<div class="xp"><div class="xpb" id="xpb"></div><span id="xpt">0%</span></div>
+<div class="stats">
+<div class="stat"><b id="nAll">0</b>📦 ทั้งหมด</div>
+<div class="stat"><b id="nOk" style="color:var(--ok)">0</b>✅ พบแล้ว</div>
+<div class="stat"><b id="nMiss" style="color:var(--bad)">0</b>❌ ขาด</div>
+</div>
+<div class="tabs">
+<button data-t="miss" class="on">❌ ขาด</button>
+<button data-t="found">✅ พบแล้ว</button>
+<button data-t="extra">❓ นอกรายการ</button>
+</div>
+<div id="list" class="list"></div>
+<div class="row" style="margin-top:10px">
+<button id="copy" class="sec">คัดลอกสรุป</button>
+<button id="reset" class="sec">ล้างผลสแกน</button><button id="wipe" class="sec">ล้างรายการที่โหลด</button>
+</div>
+</div>
+<div class="card hide" id="c5">
+<h2>รวมไฟล์ Excel จากหลายเครื่อง</h2>
+<input type="file" id="mFiles" accept=".xlsx,.xls,.csv" multiple>
+<div class="stats" style="margin-top:10px"><div class="stat"><b id="mFi">0</b>ไฟล์</div><div class="stat"><b id="mUn">0</b>เครื่อง (ไม่ซ้ำ)</div><div class="stat"><b id="mDu" style="color:var(--warn)">0</b>ซ้ำ</div></div>
+<div id="mInfo" style="color:var(--mu);margin-top:8px"></div>
+<div id="mList" class="list" style="margin-top:8px"></div>
+<div class="row" style="margin-top:10px"><button id="mExp">ส่งออก Excel</button><button id="mCopy" class="sec">คัดลอกรายการ</button></div>
+</div>
+<div class="card hide" id="c4">
+<h2>รายการรับเข้าใหม่</h2>
+<div class="row"><div><label>ยี่ห้อ (ใส่ให้ทุกเครื่องที่สแกนต่อไป)</label><input type="text" id="nBr" placeholder="เช่น KY"></div><div><label>รุ่น</label><input type="text" id="nMd" placeholder="เช่น KYEM-17"></div></div>
+<div class="row" style="margin-top:8px"><div><label>ประเภท</label><select id="nTp" style="width:100%"><option value="">(ไม่ระบุ)</option><option>1P2W</option><option>3P4W</option></select></div><div><label>ขนาด (A)</label><select id="nSz" style="width:100%"><option value="">(ไม่ระบุ)</option><option>5(15)</option><option>15(45)</option><option>30(100)</option><option>5(100)</option></select></div></div>
+<div class="row" style="margin-top:10px;align-items:end"><div><label>🎯 เป้าหมาย (เครื่อง)</label><input type="text" id="nTarget" inputmode="numeric" value="100"></div><div class="stat" style="flex:1"><b id="nCnt">0</b>📦 สแกนแล้ว</div></div>
+<div class="xp" style="margin-top:10px"><div class="xpb" id="nXpb"></div><span id="nXpt">0%</span></div>
+<div id="nList" class="list" style="margin-top:8px"></div>
+<div class="row" style="margin-top:10px"><button id="nExp">ส่งออก Excel</button><button id="nCopy" class="sec">คัดลอกรายการ</button></div>
+<div class="row" style="margin-top:8px"><button id="nUndo" class="sec">ลบตัวล่าสุด</button><button id="nClr" class="sec">เริ่มรายการใหม่</button></div>
+</div>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
+<script>
+const $=id=>document.getElementById(id);
+let rows=[],found=[],extra=[],tab="miss",sheet=[],qr=null,lastCode="",lastTime=0;
+const norm=s=>String(s==null?"":s).replace(/\s+/g,"").trim();
+
+function save(){try{localStorage.setItem("mc",JSON.stringify({rows,found,extra}))}catch(e){}}
+function load(){try{const d=JSON.parse(localStorage.getItem("mc")||"null");if(d){rows=d.rows||[];found=d.found||[];extra=d.extra||[]}}catch(e){}}
+
+async function copyText(t){
+  try{await navigator.clipboard.writeText(t);return true}catch(e){}
+  try{const x=document.createElement("textarea");x.value=t;x.style.cssText="position:fixed;top:0;left:0;opacity:0";document.body.appendChild(x);x.focus();x.select();const ok=document.execCommand("copy");x.remove();return ok}catch(e){return false}
+}
+function showBox(t){const x=$("tbox");x.value=t;x.classList.remove("hide");x.focus();x.select()}
+function stamp(){const d=new Date(),p=n=>String(n).padStart(2,"0");return d.getFullYear()+p(d.getMonth()+1)+p(d.getDate())+"-"+p(d.getHours())+p(d.getMinutes())}
+function blobSave(buf,name){const b=new Blob([buf],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});const u=URL.createObjectURL(b);const a=document.createElement("a");a.href=u;a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(u);a.remove()},4000)}
+let ac=null;
+function beep(c){
+  try{
+    if(!$("snd").checked)return;
+    ac=ac||new (window.AudioContext||window.webkitAudioContext)();
+    if(ac.state==="suspended")ac.resume();
+    const o=ac.createOscillator(),g=ac.createGain();o.connect(g);g.connect(ac.destination);
+    const f=c==="m-ok"?[880,1320]:c==="m-bad"?[220,160]:[440,440];
+    o.type=c==="m-bad"?"sawtooth":"sine";
+    const t=ac.currentTime;o.frequency.setValueAtTime(f[0],t);o.frequency.setValueAtTime(f[1],t+.1);
+    g.gain.setValueAtTime(.15,t);g.gain.exponentialRampToValueAtTime(.001,t+.25);
+    o.start(t);o.stop(t+.26);
+  }catch(e){}
+}
+function msg(t,c){const m=$("msg");m.className=c;m.textContent=({"m-ok":"✅ ","m-bad":"❌ ","m-warn":"⚠️ "}[c]||"")+t;m.style.display="block";m.style.animation="none";void m.offsetWidth;m.style.animation="";beep(c)}
+
+let hasHead=true;
+function buildCols(){
+  if(!sheet.length)return;
+  const first=sheet[0];
+  const head=first.map((h,i)=>hasHead?(norm(h)||("คอลัมน์ "+(i+1))):("คอลัมน์ "+(i+1)+" (เช่น "+norm(first[i]).slice(0,14)+")"));
+  const opts=(sel,none)=>{sel.innerHTML=(none?'<option value="-1">(ไม่มี)</option>':"")+head.map((h,i)=>`<option value="${i}">${esc(h)}</option>`).join("")};
+  opts($("cSn"));opts($("cBr"),1);opts($("cMd"),1);opts($("cTp"),1);opts($("cSz"),1);
+  const find=(re)=>hasHead?first.map(h=>norm(h).toLowerCase()).findIndex(h=>re.test(h)):-1;
+  let i=find(/เลข|serial|meter|หมายเลข|sn|pea/);
+  if(i<0){
+    let bc=0;const body=hasHead?sheet.slice(1):sheet;
+    first.forEach((_,c)=>{const n=body.filter(r=>{const v=norm(r[c]);return /^[A-Za-z0-9-]{6,}$/.test(v)&&/\d/.test(v)}).length;if(n>bc){bc=n;i=c}});
+  }
+  if(i<0)i=0;
+  $("cSn").value=i;
+  $("cBr").value=find(/ยี่ห้อ|brand|make/);$("cMd").value=find(/รุ่น|model/);$("cTp").value=find(/ประเภท|type|phase|เฟส/);$("cSz").value=find(/ขนาด|size|amp|แอมป์/);
+  $("cols").classList.remove("hide");
+  $("info").textContent="พบ "+(hasHead?sheet.length-1:sheet.length)+" แถว ตรวจคอลัมน์ให้ถูกแล้วกด “ใช้รายการนี้”";
+}
+$("hh").onchange=()=>{hasHead=$("hh").checked;buildCols()};
+$("file").onchange=async e=>{
+  const f=e.target.files[0];if(!f)return;
+  try{
+    const wb=XLSX.read(await f.arrayBuffer(),{type:"array"});
+    sheet=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1,raw:false,defval:""});
+    if(!sheet.length){$("info").textContent="ไฟล์ว่าง";return}
+    hasHead=!sheet[0].some(c=>/\d{6,}/.test(norm(c)));
+    $("hh").checked=hasHead;
+    buildCols();
+  }catch(err){$("info").textContent="อ่านไฟล์ไม่ได้ ลองบันทึกเป็น .xlsx แล้วโหลดใหม่"}
+};
+
+$("apply").onclick=()=>{
+  const a=+$("cSn").value,b=+$("cBr").value,c=+$("cMd").value,tp=+$("cTp").value,sz=+$("cSz").value,seen={};
+  const body=hasHead?sheet.slice(1):sheet;
+  rows=[];let blank=0;const dup=[];
+  body.forEach(r=>{
+    const sn=norm(r[a]);
+    if(!sn){blank++;return}
+    const k=sn.toUpperCase();
+    if(seen[k]){dup.push(sn);return}
+    seen[k]=1;
+    rows.push({sn,brand:b>=0?norm(r[b]):"",model:c>=0?norm(r[c]):"",type:tp>=0?norm(r[tp]):"",size:sz>=0?norm(r[sz]):""});
+  });
+  found=[];extra=[];save();$("cols").classList.add("hide");
+  $("info").textContent="โหลดแล้ว "+rows.length+" เครื่อง (แถวในไฟล์ "+body.length+" · ว่าง "+blank+" · ซ้ำ "+dup.length+(dup.length?" เช่น "+dup.slice(0,3).join(", "):"")+")";
+  render();
+};
+
+function showRaw(raw,fmt){
+  const el=$("raw");el.classList.remove("hide");el.textContent="";
+  const t=String(raw);
+  const a=document.createElement("div");a.textContent="ชนิด: "+(fmt||"ไม่ทราบ")+" · ยาว "+t.length+" ตัวอักษร";
+  const b=document.createElement("div");b.style.cssText="font:16px monospace;word-break:break-all;margin-top:6px;padding:8px;border:1px solid var(--bd);border-radius:8px";b.textContent=t;
+  const c=document.createElement("div");c.style.cssText="margin-top:6px;color:var(--mu);font-size:13px";
+  const m=t.match(/\d{10}/g);c.textContent=m?"เลข 10 หลักที่พบ: "+m.join(", "):"ไม่พบเลข 10 หลัก";
+  el.append(a,b,c);
+  try{navigator.vibrate&&navigator.vibrate(120)}catch(e){}
+}
+function handle(raw,fmt){
+  if($("test").checked){showRaw(raw,fmt);return}
+  if(mode==="new"){addNew(raw);return}
+  const code=norm(raw);if(!code||!rows.length){if(!rows.length)msg("ยังไม่ได้โหลดรายการ Excel","m-warn");return}
+  let r=rows.find(x=>x.sn.toUpperCase()===code.toUpperCase())||rows.find(x=>x.sn.length>=6&&code.toUpperCase().includes(x.sn.toUpperCase()));
+  if(r){
+    if(found.includes(r.sn)){msg("สแกนไปแล้ว: "+r.sn,"m-warn")}
+    else{found.push(r.sn);save();msg("พบ ✓ "+r.sn+" "+[r.brand,r.model,r.type,r.size].filter(Boolean).join(" · "),"m-ok")}
+  }else{
+    if(!extra.includes(code)){extra.push(code);save()}
+    msg("ไม่อยู่ในรายการ: "+code,"m-bad");
+  }
+  try{navigator.vibrate&&navigator.vibrate(120)}catch(e){}
+  render();
+}
+
+$("start").onclick=async()=>{
+  try{
+    qr=new Html5Qrcode("reader");
+    await qr.start({facingMode:"environment"},{fps:10,qrbox:{width:260,height:200}},(t,res)=>{
+      const n=Date.now();if(t===lastCode&&n-lastTime<2500)return;lastCode=t;lastTime=n;handle(t,res&&res.result&&res.result.format&&res.result.format.formatName)
+    });
+    $("start").classList.add("hide");$("stop").classList.remove("hide");
+  }catch(e){msg("เปิดกล้องไม่ได้ ตรวจว่าอนุญาตให้เบราว์เซอร์ใช้กล้องแล้ว หรือใช้ปุ่ม “ถ่ายรูปบาร์โค้ด” หรือพิมพ์เลขแทน","m-warn")}
+};
+$("stop").onclick=async()=>{try{await qr.stop();qr.clear()}catch(e){}
+  $("stop").classList.add("hide");$("start").classList.remove("hide")};
+
+$("photo").onchange=async e=>{
+  const f=e.target.files[0];if(!f)return;
+  e.target.value="";
+  try{
+    if(window.BarcodeDetector){
+      try{
+        const sup=await BarcodeDetector.getSupportedFormats();
+        const det=new BarcodeDetector({formats:sup});
+        const bmp=await createImageBitmap(f);
+        const res=await det.detect(bmp);
+        if(res.length){
+          const pick=res.find(r=>r.format!=="qr_code")||res[0];
+          handle(pick.rawValue,String(pick.format).toUpperCase());return
+        }
+      }catch(e2){}
+    }
+    const q=new Html5Qrcode("reader");let t,fm;
+    if(q.scanFileV2){const r=await q.scanFileV2(f,false);t=r.decodedText;fm=r.result&&r.result.format&&r.result.format.formatName}else{t=await q.scanFile(f,false)}
+    handle(t,fm);q.clear()}
+  catch(err){msg("อ่านบาร์โค้ดจากรูปไม่ได้ ลองถ่ายใกล้ขึ้นหรือพิมพ์เลขแทน","m-bad")}
+  e.target.value="";
+};
+$("add").onclick=()=>{handle($("manual").value);$("manual").value="";$("manual").focus()};
+$("manual").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();$("add").onclick()}});
+["nBr","nMd","nTarget"].forEach(id=>$(id).addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();e.target.blur()}}));
+document.addEventListener("change",e=>{if(e.target.tagName==="SELECT")e.target.blur()});
+document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("button");if(b)setTimeout(()=>b.blur(),0)},true);
+function applyScanner(on){["start","stop","photoLbl"].forEach(id=>{$(id).style.display=on?"none":""});$("ready").classList.toggle("hide",!on);try{localStorage.setItem("mcscan",on?"1":"0")}catch(e){}}
+$("scn").onchange=()=>applyScanner($("scn").checked);
+let sbuf="",stimer=null;
+document.addEventListener("keydown",e=>{
+  const tg=e.target&&e.target.tagName;
+  if(tg==="INPUT"||tg==="TEXTAREA"||tg==="SELECT"||mode==="merge")return;
+  if(e.ctrlKey||e.metaKey||e.altKey)return;
+  if(e.key==="Enter"){
+    if(sbuf.length>=4){e.preventDefault();const v=sbuf;sbuf="";handle(v)}else sbuf="";
+    return;
+  }
+  if(e.key&&e.key.length===1){
+    sbuf+=e.key;clearTimeout(stimer);stimer=setTimeout(()=>{sbuf=""},800);
+    if(e.key===" ")e.preventDefault();
+  }
+});
+
+let mode="check",newList=[];
+const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+function saveNew(){try{localStorage.setItem("mcnew",JSON.stringify(newList))}catch(e){}}
+function loadNew(){try{newList=JSON.parse(localStorage.getItem("mcnew")||"[]")||[]}catch(e){newList=[]}}
+function setMode(m){
+  mode=m;["c1","c3"].forEach(i=>$(i).classList.toggle("hide",m!=="check"));$("c2").classList.toggle("hide",m==="merge");$("c4").classList.toggle("hide",m!=="new");$("c5").classList.toggle("hide",m!=="merge");
+  document.querySelectorAll("#modes button").forEach(b=>b.classList.toggle("on",b.dataset.m===m));
+  try{localStorage.setItem("mcmode",m)}catch(e){}
+  $("msg").style.display="none";
+}
+document.querySelectorAll("#modes button").forEach(b=>b.onclick=()=>setMode(b.dataset.m));
+function addNew(raw){
+  const s=norm(raw).replace(/^\][A-Za-z]\d/,"").replace(/^PEA/i,"").toUpperCase();
+  if(!s)return;
+  if(/^https?:/i.test(s)){msg("นี่คือคิวอาร์ลิงก์ ไม่ใช่เลขมิเตอร์ ให้สแกนบาร์โค้ดแทน","m-bad");return}
+  if(newList.some(x=>x.sn===s)){msg("สแกนซ้ำ: "+s,"m-warn");return}
+  const d=new Date(),p=n=>String(n).padStart(2,"0");
+  newList.push({sn:s,brand:$("nBr").value.trim(),model:$("nMd").value.trim(),type:$("nTp").value,size:$("nSz").value,time:d.getFullYear()+"-"+p(d.getMonth()+1)+"-"+p(d.getDate())+" "+p(d.getHours())+":"+p(d.getMinutes())+":"+p(d.getSeconds())});
+  saveNew();msg("เพิ่ม ✓ "+s+" (เครื่องที่ "+newList.length+")","m-ok");
+  try{navigator.vibrate&&navigator.vibrate(120)}catch(e){}
+  renderNew();
+}
+function renderNew(){
+  $("nCnt").textContent=newList.length;
+  {const tg=parseInt($("nTarget").value)||0,pc=tg?Math.min(100,Math.round(newList.length/tg*100)):0;$("nXpb").style.width=pc+"%";$("nXpt").textContent=tg?(pc>=100?"🎉 ครบเป้า "+newList.length+"/"+tg:newList.length+"/"+tg+" ("+pc+"%)"):"ตั้งเป้าหมายได้ที่ช่องด้านบน"}
+  $("nList").innerHTML=newList.length?newList.map((x,i)=>({x,i})).reverse().map(o=>'<div class="it" style="display:flex;gap:8px;align-items:center"><div style="flex:1;min-width:0">'+(o.i+1)+'. '+esc(o.x.sn)+'<small>'+esc([o.x.brand,o.x.model,o.x.type,o.x.size].filter(Boolean).join(" · "))+'</small></div><button class="sec del" data-i="'+o.i+'" style="min-height:36px;padding:4px 10px;flex:0 0 auto">🗑️</button></div>').join(""):'<div class="it" style="color:var(--mu)">ยังไม่มีรายการ สแกนมิเตอร์เครื่องแรกได้เลย</div>';
+}
+$("nTarget").oninput=()=>{try{localStorage.setItem("mctarget",$("nTarget").value)}catch(e){}renderNew()};
+$("manBtn").onclick=()=>{const h=$("man").classList.toggle("hide");$("manBtn").textContent=h?"📖 คู่มือการใช้งาน":"✖ ปิดคู่มือ"};
+$("nList").onclick=e=>{const b=e.target.closest(".del");if(!b)return;newList.splice(+b.dataset.i,1);saveNew();renderNew()};
+$("nUndo").onclick=()=>{if(newList.length){const x=newList.pop();saveNew();renderNew();msg("ลบแล้ว: "+x.sn,"m-warn")}};
+let mRows=[];
+const cleanSn=s=>norm(s).replace(/^\][A-Za-z]\d/,'').replace(/^PEA/i,'').toUpperCase();
+const pickCol=(head,re)=>head.findIndex(h=>re.test(String(h).toLowerCase()));
+$('mFiles').onchange=async e=>{
+  const fs=[...e.target.files];if(!fs.length)return;
+  const map=new Map(),conf=[],bad=[];let dup=0;
+  for(const f of fs){
+    try{
+      const wb=XLSX.read(await f.arrayBuffer(),{type:'array'});
+      const sh=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1,raw:false,defval:''});
+      if(!sh.length)continue;
+      const head=sh[0].map(h=>norm(h));
+      let a=pickCol(head,/เลขมิเตอร์|เลข|serial|meter|หมายเลข|sn|pea/);
+      if(a<0){let bc=0;head.forEach((_,c)=>{const n=sh.slice(1).filter(r=>/^[A-Za-z0-9-]{8,}$/.test(norm(r[c]))).length;if(n>bc){bc=n;a=c}})}
+      if(a<0){bad.push(f.name);continue}
+      const b=pickCol(head,/ยี่ห้อ|brand|make/),m=pickCol(head,/รุ่น|model/),t=pickCol(head,/เวลา|time/),tp=pickCol(head,/ประเภท|type|phase|เฟส/),sz=pickCol(head,/ขนาด|size|amp|แอมป์/);
+      sh.slice(1).forEach(r=>{
+        const sn=cleanSn(r[a]);if(!sn)return;
+        const o={sn,brand:b>=0?norm(r[b]):'',model:m>=0?norm(r[m]):'',type:tp>=0?norm(r[tp]):'',size:sz>=0?norm(r[sz]):'',time:t>=0?String(r[t]||''):''};
+        const ex=map.get(sn);
+        if(!ex){map.set(sn,o);return}
+        dup++;
+        if((ex.brand&&o.brand&&ex.brand!==o.brand)||(ex.model&&o.model&&ex.model!==o.model))conf.push(sn);
+        if(!ex.brand)ex.brand=o.brand;
+        if(!ex.model)ex.model=o.model;
+        if(!ex.type)ex.type=o.type;if(!ex.size)ex.size=o.size;
+        if(o.time&&(!ex.time||o.time<ex.time))ex.time=o.time;
+      });
+    }catch(err){bad.push(f.name)}
+  }
+  mRows=[...map.values()];
+  $('mFi').textContent=fs.length-bad.length;$('mUn').textContent=mRows.length;$('mDu').textContent=dup;
+  let info='';
+  if(conf.length)info+='ยี่ห้อ/รุ่นไม่ตรงกันในเลขซ้ำ '+conf.length+' เครื่อง เช่น '+conf.slice(0,3).join(', ')+' (ใช้ค่าที่พบก่อน) ';
+  if(bad.length)info+='อ่านไม่ได้: '+bad.join(', ');
+  $('mInfo').textContent=info;
+  renderM();
+};
+function renderM(){
+  $('mList').innerHTML=mRows.length?mRows.slice(0,300).map((x,i)=>'<div class="it">'+(i+1)+'. '+esc(x.sn)+'<small>'+esc([x.brand,x.model,x.type,x.size].filter(Boolean).join(' · '))+'</small></div>').join('')+(mRows.length>300?'<div class="it" style="color:var(--mu)">… แสดง 300 รายการแรก</div>':''):'<div class="it" style="color:var(--mu)">เลือกไฟล์ Excel ได้หลายไฟล์พร้อมกัน</div>';
+}
+async function exportX(rows,prefix){
+  if(!rows.length){msg('ยังไม่มีรายการให้ส่งออก','m-warn');return}
+  try{
+    const ws=XLSX.utils.aoa_to_sheet([['ลำดับ','เลขมิเตอร์','ยี่ห้อ','รุ่น','ประเภท','ขนาด','เวลาที่สแกน']].concat(rows.map((x,i)=>[i+1,x.sn,x.brand,x.model,x.type||'',x.size||'',x.time])));
+    ws['!cols']=[{wch:8},{wch:18},{wch:16},{wch:16},{wch:10},{wch:12},{wch:22}];
+    const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'มิเตอร์');
+    const buf=XLSX.write(wb,{bookType:'xlsx',type:'array'});
+    const dl=null;
+    if(!dl){blobSave(buf,prefix+stamp()+'.xlsx');msg('ส่งออกแล้ว ดูไฟล์ในโฟลเดอร์ดาวน์โหลดของมือถือ','m-ok');return}
+    const d=new Date(),p=n=>String(n).padStart(2,'0');
+    await dl.save({filename:prefix+d.getFullYear()+p(d.getMonth()+1)+p(d.getDate())+'.xlsx',data:buf});
+    msg('ส่งออกแล้ว ('+rows.length+' เครื่อง)','m-ok');
+  }catch(e){msg(e&&e.code==='declined'?'ยกเลิกการบันทึก':'บันทึกไฟล์ไม่สำเร็จ ลองปุ่มคัดลอกรายการ','m-warn')}
+}
+$('mExp').onclick=()=>exportX(mRows,'merged-');
+$('mCopy').onclick=async()=>{
+  if(!mRows.length){msg('ยังไม่มีรายการ','m-warn');return}
+  const t='ลำดับ\tเลขมิเตอร์\tยี่ห้อ\tรุ่น\tประเภท\tขนาด\tเวลาที่สแกน\n'+mRows.map((x,i)=>[i+1,x.sn,x.brand,x.model,x.type||'',x.size||'',x.time].join('\t')).join('\n');
+  if(await copyText(t))msg('คัดลอกแล้ว วางใน Excel ได้เลย','m-ok');else{showBox(t);msg('คัดลอกอัตโนมัติไม่ได้ กดค้างที่กล่องข้อความด้านล่างเพื่อคัดลอกเอง','m-warn')}
+};
+let clrT=null;
+$("nClr").onclick=()=>{
+  const b=$("nClr");
+  if(clrT){clearTimeout(clrT);clrT=null;b.textContent="เริ่มรายการใหม่";newList=[];saveNew();renderNew();msg("ล้างรายการแล้ว","m-warn");return}
+  b.textContent="กดอีกครั้งเพื่อยืนยันล้างทั้งหมด";clrT=setTimeout(()=>{clrT=null;b.textContent="เริ่มรายการใหม่"},3500);
+};
+$("nCopy").onclick=async()=>{
+  if(!newList.length){msg("ยังไม่มีรายการ","m-warn");return}
+  const t="ลำดับ\tเลขมิเตอร์\tยี่ห้อ\tรุ่น\tประเภท\tขนาด\tเวลาที่สแกน\n"+newList.map((x,i)=>[i+1,x.sn,x.brand,x.model,x.type||"",x.size||"",x.time].join("\t")).join("\n");
+  if(await copyText(t))msg("คัดลอกแล้ว วางใน Excel ได้เลย","m-ok");else{showBox(t);msg("คัดลอกอัตโนมัติไม่ได้ กดค้างที่กล่องข้อความด้านล่างเพื่อคัดลอกเอง","m-warn")}
+};
+$("nExp").onclick=async()=>{
+  if(!newList.length){msg("ยังไม่มีรายการให้ส่งออก","m-warn");return}
+  try{
+    const ws=XLSX.utils.aoa_to_sheet([["ลำดับ","เลขมิเตอร์","ยี่ห้อ","รุ่น","ประเภท","ขนาด","เวลาที่สแกน"]].concat(newList.map((x,i)=>[i+1,x.sn,x.brand,x.model,x.type||"",x.size||"",x.time])));
+    ws["!cols"]=[{wch:8},{wch:18},{wch:16},{wch:16},{wch:10},{wch:12},{wch:22}];
+    const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,"มิเตอร์");
+    const buf=XLSX.write(wb,{bookType:"xlsx",type:"array"});
+    const dl=null;
+    if(!dl){blobSave(buf,"meters-"+stamp()+".xlsx");msg("ส่งออกแล้ว ดูไฟล์ในโฟลเดอร์ดาวน์โหลดของมือถือ","m-ok");return}
+    const d=new Date(),p=n=>String(n).padStart(2,"0");
+    await dl.save({filename:"meters-"+d.getFullYear()+p(d.getMonth()+1)+p(d.getDate())+".xlsx",data:buf});
+    msg("ส่งออกแล้ว ("+newList.length+" เครื่อง)","m-ok");
+  }catch(e){msg(e&&e.code==="declined"?"ยกเลิกการบันทึก":"บันทึกไฟล์ไม่สำเร็จ ลองปุ่มคัดลอกรายการ","m-warn")}
+};
+
+document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{
+  tab=b.dataset.t;document.querySelectorAll(".tabs button").forEach(x=>x.classList.toggle("on",x===b));render()});
+
+function item(r){return `<div class="it">${r.sn}<small>${[r.brand,r.model,r.type,r.size].filter(Boolean).join(" · ")}</small></div>`}
+function render(){
+  const miss=rows.filter(r=>!found.includes(r.sn)),ok=rows.filter(r=>found.includes(r.sn));
+  $("nAll").textContent=rows.length;$("nOk").textContent=ok.length;$("nMiss").textContent=miss.length;
+  {const pc=rows.length?Math.round(ok.length/rows.length*100):0;$("xpb").style.width=pc+"%";$("xpt").textContent=rows.length&&!miss.length?"🎉 ครบทุกเครื่อง!":ok.length+"/"+rows.length+" ("+pc+"%)"}
+  const L=tab==="miss"?miss:tab==="found"?ok:extra.map(s=>({sn:s,brand:"",model:""}));
+  $("list").innerHTML=L.length?L.map(item).join(""):'<div class="it" style="color:var(--mu)">'+(rows.length&&tab==="miss"?"ครบทุกเครื่อง ✓":"ไม่มีรายการ")+"</div>";
+}
+$("copy").onclick=async()=>{
+  const miss=rows.filter(r=>!found.includes(r.sn));
+  const t="ตรวจมิเตอร์ พบ "+found.length+"/"+rows.length+" ขาด "+miss.length+"\n"+miss.map(r=>r.sn+" "+[r.brand,r.model,r.type,r.size].filter(Boolean).join(" ")).join("\n")+(extra.length?"\nนอกรายการ: "+extra.join(", "):"");
+  if(await copyText(t))msg("คัดลอกแล้ว","m-ok");else{showBox(t);msg("คัดลอกอัตโนมัติไม่ได้ กดค้างที่กล่องข้อความด้านล่างเพื่อคัดลอกเอง","m-warn")}
+};
+function twoTap(id,label,fn){let t=null;$(id).onclick=()=>{const b=$(id);if(t){clearTimeout(t);t=null;b.textContent=label;fn();return}b.textContent="กดอีกครั้งเพื่อยืนยัน";t=setTimeout(()=>{t=null;b.textContent=label},3500)}}
+twoTap("reset","ล้างผลสแกน",()=>{found=[];extra=[];save();$("msg").style.display="none";render()});
+twoTap("wipe","ล้างรายการที่โหลด",()=>{rows=[];found=[];extra=[];sheet=[];save();$("msg").style.display="none";$("info").textContent="ล้างรายการแล้ว โหลดไฟล์ใหม่ได้เลย";$("cols").classList.add("hide");$("file").value="";render()});
+
+load();if(rows.length)$("info").textContent="รายการเดิม "+rows.length+" เครื่อง (โหลดไฟล์ใหม่เพื่อเปลี่ยน)";render();
+loadNew();try{const tg=localStorage.getItem("mctarget");if(tg)$("nTarget").value=tg}catch(e){}renderNew();renderM();
+try{setMode(localStorage.getItem("mcmode")||"check")}catch(e){setMode("check")}
+try{const v=localStorage.getItem("mcscan")==="1";$("scn").checked=v;applyScanner(v)}catch(e){}
+</script>
+<script>if("serviceWorker" in navigator&&(location.protocol==="https:"||location.hostname==="localhost")){window.addEventListener("load",()=>{navigator.serviceWorker.register("./sw.js").catch(()=>{})})}</script>
+</body>
+</html>
