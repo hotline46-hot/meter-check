@@ -102,6 +102,7 @@ input[type=text]{box-sizing:border-box;width:100%;min-width:0}
 <li>กด <b>📷 เปิดกล้องสแกน</b> แล้วส่องบาร์โค้ดหน้ามิเตอร์ทีละเครื่อง</li>
 <li>ป้ายผล: ✅ พบในรายการ · ⚠️ สแกนซ้ำ · ❌ ไม่อยู่ในรายการ</li>
 <li>ดูผลด้านล่าง: แท็บ <b>❌ ขาด</b> คือเครื่องที่ยังไม่เจอ กด “คัดลอกสรุป” ส่งเข้าไลน์ได้</li>
+<li>กด <b>📤 ส่งออก Excel (เฉพาะที่พบ)</b> ได้ไฟล์เฉพาะมิเตอร์ที่สแกนเจอ พร้อมเวลาที่สแกน</li>
 </ol></details>
 <details class="man"><summary>📥 รับเข้าใหม่ (สแกนแล้วสร้างไฟล์ Excel)</summary><ol>
 <li>กดแท็บ <b>📥 รับเข้าใหม่</b> (ไม่ต้องใช้ไฟล์ Excel)</li>
@@ -193,6 +194,7 @@ input[type=text]{box-sizing:border-box;width:100%;min-width:0}
 <button data-t="extra">❓ นอกรายการ</button>
 </div>
 <div id="list" class="list"></div>
+<div class="row" style="margin-top:10px"><button id="fExp" style="width:100%">📤 ส่งออก Excel (เฉพาะที่พบ)</button></div>
 <div class="row" style="margin-top:10px">
 <button id="copy" class="sec">คัดลอกสรุป</button>
 <button id="reset" class="sec">ล้างผลสแกน</button><button id="wipe" class="sec">ล้างรายการที่โหลด</button>
@@ -225,8 +227,10 @@ const $=id=>document.getElementById(id);
 let rows=[],found=[],extra=[],tab="miss",sheet=[],qr=null,lastCode="",lastTime=0;
 const norm=s=>String(s==null?"":s).replace(/\s+/g,"").trim();
 
-function save(){try{localStorage.setItem("mc",JSON.stringify({rows,found,extra}))}catch(e){}}
-function load(){try{const d=JSON.parse(localStorage.getItem("mc")||"null");if(d){rows=d.rows||[];found=d.found||[];extra=d.extra||[]}}catch(e){}}
+let foundT={};
+function nowStr(){const d=new Date(),p=n=>String(n).padStart(2,"0");return d.getFullYear()+"-"+p(d.getMonth()+1)+"-"+p(d.getDate())+" "+p(d.getHours())+":"+p(d.getMinutes())+":"+p(d.getSeconds())}
+function save(){try{localStorage.setItem("mc",JSON.stringify({rows,found,extra,foundT}))}catch(e){}}
+function load(){try{const d=JSON.parse(localStorage.getItem("mc")||"null");if(d){rows=d.rows||[];found=d.found||[];extra=d.extra||[];foundT=d.foundT||{}}}catch(e){}}
 
 async function copyText(t){
   try{await navigator.clipboard.writeText(t);return true}catch(e){}
@@ -317,7 +321,7 @@ function handle(raw,fmt){
   let r=rows.find(x=>x.sn.toUpperCase()===code.toUpperCase())||rows.find(x=>x.sn.length>=6&&code.toUpperCase().includes(x.sn.toUpperCase()));
   if(r){
     if(found.includes(r.sn)){msg("สแกนไปแล้ว: "+r.sn,"m-warn")}
-    else{found.push(r.sn);save();msg("พบ ✓ "+r.sn+" "+[r.brand,r.model,r.type,r.size].filter(Boolean).join(" · "),"m-ok")}
+    else{found.push(r.sn);foundT[r.sn]=nowStr();save();msg("พบ ✓ "+r.sn+" "+[r.brand,r.model,r.type,r.size].filter(Boolean).join(" · "),"m-ok")}
   }else{
     if(!extra.includes(code)){extra.push(code);save()}
     msg("ไม่อยู่ในรายการ: "+code,"m-bad");
@@ -511,14 +515,15 @@ function render(){
   const L=tab==="miss"?miss:tab==="found"?ok:extra.map(s=>({sn:s,brand:"",model:""}));
   $("list").innerHTML=L.length?L.map(item).join(""):'<div class="it" style="color:var(--mu)">'+(rows.length&&tab==="miss"?"ครบทุกเครื่อง ✓":"ไม่มีรายการ")+"</div>";
 }
+$("fExp").onclick=()=>{const list=found.map(sn=>{const r=rows.find(x=>x.sn===sn);return r?{...r,time:foundT[sn]||""}:null}).filter(Boolean);if(!list.length){msg("ยังไม่มีเครื่องที่พบ","m-warn");return}exportX(list,"found-")};
 $("copy").onclick=async()=>{
   const miss=rows.filter(r=>!found.includes(r.sn));
   const t="ตรวจมิเตอร์ พบ "+found.length+"/"+rows.length+" ขาด "+miss.length+"\n"+miss.map(r=>r.sn+" "+[r.brand,r.model,r.type,r.size].filter(Boolean).join(" ")).join("\n")+(extra.length?"\nนอกรายการ: "+extra.join(", "):"");
   if(await copyText(t))msg("คัดลอกแล้ว","m-ok");else{showBox(t);msg("คัดลอกอัตโนมัติไม่ได้ กดค้างที่กล่องข้อความด้านล่างเพื่อคัดลอกเอง","m-warn")}
 };
 function twoTap(id,label,fn){let t=null;$(id).onclick=()=>{const b=$(id);if(t){clearTimeout(t);t=null;b.textContent=label;fn();return}b.textContent="กดอีกครั้งเพื่อยืนยัน";t=setTimeout(()=>{t=null;b.textContent=label},3500)}}
-twoTap("reset","ล้างผลสแกน",()=>{found=[];extra=[];save();$("msg").style.display="none";render()});
-twoTap("wipe","ล้างรายการที่โหลด",()=>{rows=[];found=[];extra=[];sheet=[];save();$("msg").style.display="none";$("info").textContent="ล้างรายการแล้ว โหลดไฟล์ใหม่ได้เลย";$("cols").classList.add("hide");$("file").value="";render()});
+twoTap("reset","ล้างผลสแกน",()=>{found=[];extra=[];foundT={};save();$("msg").style.display="none";render()});
+twoTap("wipe","ล้างรายการที่โหลด",()=>{rows=[];found=[];extra=[];foundT={};sheet=[];save();$("msg").style.display="none";$("info").textContent="ล้างรายการแล้ว โหลดไฟล์ใหม่ได้เลย";$("cols").classList.add("hide");$("file").value="";render()});
 
 load();if(rows.length)$("info").textContent="รายการเดิม "+rows.length+" เครื่อง (โหลดไฟล์ใหม่เพื่อเปลี่ยน)";render();
 loadNew();try{const tg=localStorage.getItem("mctarget");if(tg)$("nTarget").value=tg}catch(e){}renderNew();renderM();
