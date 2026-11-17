@@ -246,11 +246,15 @@ input[type=text]{box-sizing:border-box;width:100%;min-width:0}
 <div class="row"><button id="sSave" class="big">💾 บันทึกรายการ</button></div>
 <div class="row" style="margin-top:8px"><button id="sClr" class="sec">ล้างฟอร์ม</button></div>
 <div id="sMsg" style="display:none"></div>
+<div id="sSync" style="font-size:13px;color:var(--mu);text-align:center;margin-top:8px"></div>
 </div>
 <div class="card"><h2>📊 สรุปรายเดือน</h2>
-<label>เลือกเดือน</label><select id="sMon" style="width:100%"></select>
+<label>แหล่งข้อมูล</label><select id="sSrc" style="width:100%"><option value="local">📱 ข้อมูลเครื่องนี้</option><option value="team">🌐 ข้อมูลทั้งทีม</option></select>
+<div id="sSrcInfo" style="font-size:13px;color:var(--mu);margin:6px 0"></div>
+<label style="margin-top:8px">เลือกเดือน</label><select id="sMon" style="width:100%"></select>
 <div id="sSum"></div>
-<div class="row" style="margin-top:10px"><button id="sSumExp" class="sec">📤 ส่งออกสรุปรายเดือน (Excel)</button></div></div>
+<div class="row" style="margin-top:10px"><button id="sSumExp" class="sec">📤 ส่งออกสรุปรายเดือน (Excel)</button></div>
+<div class="row" style="margin-top:8px"><button id="sTeamReload" class="sec hide">🔄 โหลดข้อมูลทีมใหม่</button><button id="sTeamExp" class="sec hide">📤 ส่งออกรายการของทีม (Excel)</button></div></div>
 <div class="card"><h2>📋 รายการที่บันทึก</h2>
 <div class="xp"><div class="xpb" style="width:100%"></div><span><b id="sCnt">0</b>&nbsp;รายการ</span></div>
 <div id="sList" class="list"></div>
@@ -258,6 +262,19 @@ input[type=text]{box-sizing:border-box;width:100%;min-width:0}
 <div class="row" style="margin-top:8px"><button id="sUndo" class="sec">ลบตัวล่าสุด</button><button id="sWipe" class="sec">ล้างทั้งหมด</button></div>
 <textarea id="sBox" class="hide" readonly rows="6" style="width:100%;margin-top:8px;box-sizing:border-box;border-radius:12px;padding:10px;font:14px monospace"></textarea>
 </div>
+<details class="man" style="margin-bottom:12px"><summary>⚙️ เชื่อมข้อมูลทีม (Google Sheets)</summary>
+<div style="padding-bottom:12px">
+<div id="sSync2" style="font-size:13px;color:var(--mu);margin-bottom:8px"></div>
+<label>ลิงก์สคริปต์ (Web app URL)</label>
+<input type="text" id="sUrl" placeholder="https://script.google.com/macros/s/.../exec" autocomplete="off">
+<label style="margin-top:8px">รหัสทีม</label>
+<input type="password" id="sCode" autocomplete="off" style="width:100%;box-sizing:border-box;padding:10px 12px;border-radius:12px;border:1px solid var(--bd);background:var(--card);color:var(--tx);font:inherit">
+<label style="margin-top:8px">ชื่อผู้บันทึก (ไม่กรอกก็ได้)</label>
+<input type="text" id="sBy" autocomplete="off">
+<div class="row" style="margin-top:10px"><button id="sCfgSave">💾 บันทึกการตั้งค่า</button></div>
+<div class="row" style="margin-top:8px"><button id="sSyncNow" class="sec">🔄 ส่งข้อมูลที่ค้าง</button><button id="sSyncOld" class="sec">⬆️ ส่งรายการเก่าทั้งหมดขึ้นชีต</button></div>
+<div style="font-size:13px;color:var(--mu);margin-top:10px">ส่งขึ้นชีตเฉพาะ: วันที่ เลขมิเตอร์เดิม/ใหม่ ขนาด หน่วย สาเหตุ และชื่อผู้บันทึก <b>ไม่ส่ง CA</b> (CA ยังอยู่ในเครื่องและในไฟล์ Excel ที่ส่งออกจากเครื่องนี้)</div>
+</div></details>
 </div>
 </main>
 
@@ -445,12 +462,12 @@ const TH_M=["มกราคม","กุมภาพันธ์","มีนา�
 function monLabel(k){const m=String(k).match(/^(\d{4})-(\d{2})$/);return m?TH_M[+m[2]-1]+" "+(+m[1]+543):k}
 function monKey(r){return (r.date||"").slice(0,7)}
 function sumRender(){
-  const keys=[...new Set(swapList.map(monKey).filter(Boolean))].sort().reverse();
+  const keys=[...new Set(curSrc().map(monKey).filter(Boolean))].sort().reverse();
   const sel=$("sMon"),cur=sel.value;
   sel.innerHTML='<option value="ALL">ทั้งหมด</option>'+keys.map(k=>'<option value="'+k+'">'+monLabel(k)+'</option>').join("");
   sel.value=(cur&&(cur==="ALL"||keys.includes(cur)))?cur:(keys[0]||"ALL");
   const v=sel.value;
-  const L=v==="ALL"?swapList:swapList.filter(r=>monKey(r)===v);
+  const L=v==="ALL"?curSrc():curSrc().filter(r=>monKey(r)===v);
   const by={},bs={};
   L.forEach(r=>{const c=r.cause||"ไม่ระบุสาเหตุ";by[c]=(by[c]||0)+1;const z=r.oldSz||"ไม่ระบุขนาด";bs[z]=(bs[z]||0)+1});
   const rc=Object.entries(by).sort((a,b)=>b[1]-a[1]);
@@ -471,7 +488,7 @@ function swapRender(){
     const r=o.r;
     const d1="📅 "+fmtDate(r.date)+" · "+(r.ca?"CA "+esc(r.ca)+" · ":"")+"เดิม "+esc(r.oldSz||"-")+" · "+esc(r.oldRd||"-")+" หน่วย";
     const d2="ใหม่ "+esc(r.newSz||"-")+" · "+esc(r.newRd||"-")+" หน่วย";
-    return '<div class="it" style="display:flex;gap:8px;align-items:center"><div style="flex:1;min-width:0">'+(o.i+1)+". "+esc(r.old)+" → "+esc(r.nw)+"<small>"+d1+"<br>"+d2+"<br>🛠️ "+esc(causeText(r))+"</small></div>"+'<button class="sec sdel" data-i="'+o.i+'" style="min-height:36px;padding:4px 10px;flex:0 0 auto">🗑️</button></div>';
+    return '<div class="it" style="display:flex;gap:8px;align-items:center"><div style="flex:1;min-width:0">'+(o.i+1)+". "+esc(r.old)+" → "+esc(r.nw)+(r.synced?" ☁️":"")+"<small>"+d1+"<br>"+d2+"<br>🛠️ "+esc(causeText(r))+"</small></div>"+'<button class="sec sdel" data-i="'+o.i+'" style="min-height:36px;padding:4px 10px;flex:0 0 auto">🗑️</button></div>';
   }).join(""):'<div class="it" style="color:var(--mu)">ยังไม่มีรายการ กรอกข้อมูลด้านบนแล้วกดบันทึก</div>';
 }
 function swapInit(){
@@ -481,6 +498,7 @@ function swapInit(){
   $("sDate").value=todayISO();
   ["sOldSz","sNewSz"].forEach(id=>{$(id).innerHTML='<option value="">(เลือกขนาด)</option>'+SIZES.map(z=>"<option>"+z+"</option>").join("")});
   try{swapList=JSON.parse(localStorage.getItem("mcswap")||"[]")||[]}catch(e){swapList=[]}
+  swapList.forEach(r=>{if(!r.id)r.id=newId()});loadCfgUI();updSyncStatus();setTimeout(()=>syncPending(true),800);
   const chain=["sCA","sOld","sOldRd","sNew","sNewRd"];
   chain.forEach((id,i)=>$(id).addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();if(i<chain.length-1)$(chain[i+1]).focus();else $("sSave").onclick()}}));
   swapRender();
@@ -497,16 +515,16 @@ $("sSave").onclick=()=>{
   if((oldRd&&isNaN(Number(oldRd)))||(newRd&&isNaN(Number(newRd)))){smsg("หน่วยมิเตอร์ต้องเป็นตัวเลข","m-bad");return}
   if(swapList.some(r=>r.old===old)){smsg("มิเตอร์เดิมเลขนี้บันทึกไว้แล้ว","m-warn");return}
   if(swapList.some(r=>r.nw===nw)){smsg("มิเตอร์ใหม่เลขนี้ถูกใช้ในรายการอื่นแล้ว","m-warn");return}
-  swapList.push({date:dt,cause,note:cause==="อื่น ๆ"?note:"",ca,old,oldSz:$("sOldSz").value,oldRd,nw,newSz:$("sNewSz").value,newRd,time:nowStr()});
+  swapList.push({id:newId(),synced:false,date:dt,cause,note:cause==="อื่น ๆ"?note:"",ca,old,oldSz:$("sOldSz").value,oldRd,nw,newSz:$("sNewSz").value,newRd,time:nowStr()});
   swSave();
   ["sCA","sOld","sOldRd","sNew","sNewRd","sCause","sCauseNote"].forEach(id=>{$(id).value=""});$("sCauseNote").classList.add("hide");
   smsg("บันทึกแล้ว "+old+" → "+nw+" (รายการที่ "+swapList.length+")","m-ok");
-  swapRender();$("sCA").focus();
+  swapRender();$("sCA").focus();syncPending(true);
 };
 $("sClr").onclick=()=>{["sCA","sOld","sOldRd","sNew","sNewRd","sOldSz","sNewSz","sCause","sCauseNote"].forEach(id=>{$(id).value=""});$("sCauseNote").classList.add("hide");$("sMsg").style.display="none"};
-$("sList").onclick=e=>{const b=e.target.closest(".sdel");if(!b)return;swapList.splice(+b.dataset.i,1);swSave();swapRender()};
-$("sUndo").onclick=()=>{if(swapList.length){const x=swapList.pop();swSave();swapRender();smsg("ลบแล้ว: "+x.old,"m-warn")}};
-twoTap("sWipe","ล้างทั้งหมด",()=>{swapList=[];swSave();swapRender();smsg("ล้างรายการแล้ว","m-warn")});
+$("sList").onclick=e=>{const b=e.target.closest(".sdel");if(!b)return;const rr=swapList.splice(+b.dataset.i,1)[0];swSave();swapRender();delRemote(rr)};
+$("sUndo").onclick=()=>{if(swapList.length){const x=swapList.pop();swSave();swapRender();smsg("ลบแล้ว: "+x.old,"m-warn");delRemote(x)}};
+twoTap("sWipe","ล้างทั้งหมด",()=>{swapList=[];swSave();swapRender();smsg("ล้างรายการในเครื่องแล้ว (ข้อมูลที่อยู่ในชีตไม่ถูกลบ)","m-warn")});
 $("sExp").onclick=async()=>{
   if(!swapList.length){smsg("ยังไม่มีรายการให้ส่งออก","m-warn");return}
   const num=v=>(v!==""&&!isNaN(Number(v)))?Number(v):v;
@@ -515,14 +533,83 @@ $("sExp").onclick=async()=>{
   const bad=res==="fail"||res==="declined";
   smsg(res==="declined"?"ยกเลิกการบันทึก":res==="fail"?"บันทึกไฟล์ไม่สำเร็จ ลองปุ่มคัดลอกรายการ":"ส่งออกแล้ว ("+swapList.length+" รายการ)",bad?"m-warn":"m-ok");
 };
+const SYNC_URL="https://script.google.com/macros/s/AKfycbw5klIJvnpqnNdZN3RIFdju9JriuEjUJFvtXfEZOuXc5q9EqntEdQN6hzqiRkIi2T92/exec";
+function newId(){try{if(crypto&&crypto.randomUUID)return crypto.randomUUID()}catch(e){}return Date.now().toString(36)+Math.random().toString(36).slice(2,10)}
+function syncCfg(){let u="",c="",b="";try{u=localStorage.getItem("mcsyncurl")||"";c=localStorage.getItem("mcsynccode")||"";b=localStorage.getItem("mcsyncby")||""}catch(e){}return {url:(u||SYNC_URL).trim(),code:c,by:b}}
+function cfgOK(){const c=syncCfg();return !!(c.url&&c.code)}
+function curSrc(){return srcMode==="team"?teamList:swapList}
+let srcMode="local",teamList=[];
+async function postSync(payload){
+  const c=syncCfg();if(!c.url||!c.code)throw new Error("ยังไม่ได้ตั้งค่า");
+  const r=await fetch(c.url,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(Object.assign({code:c.code},payload))});
+  const j=await r.json();if(!j.ok)throw new Error(j.error||"ผิดพลาด");return j;
+}
+function pubRec(r){return {id:r.id,time:r.time,date:r.date,old:r.old,oldSz:r.oldSz,oldRd:r.oldRd,cause:r.cause,note:r.note,nw:r.nw,newSz:r.newSz,newRd:r.newRd,by:syncCfg().by}}
+function updSyncStatus(){
+  const pend=swapList.filter(r=>r.synced===false).length;
+  const t=cfgOK()?("🟢 เชื่อมข้อมูลทีมแล้ว"+(pend?" · 🟠 ค้างส่ง "+pend+" รายการ":" · ส่งครบแล้ว")):"⚪ ยังไม่ได้เชื่อมข้อมูลทีม (ข้อมูลเก็บในเครื่องนี้)";
+  ["sSync","sSync2"].forEach(id=>{const el=$(id);if(el)el.textContent=t});
+}
+function errMsg(e){return e&&e.message==="Failed to fetch"?"ติดต่อชีตไม่ได้ (เช็กอินเทอร์เน็ต/ลิงก์ และใช้ได้เฉพาะเวอร์ชัน GitHub)":(e&&e.message)||"ผิดพลาด"}
+async function syncPending(silent){
+  if(!cfgOK()){updSyncStatus();return}
+  const pend=swapList.filter(r=>r.synced===false);
+  if(!pend.length){updSyncStatus();if(!silent)smsg("ไม่มีรายการค้างส่ง","m-ok");return}
+  try{
+    const j=await postSync({action:"add",records:pend.map(pubRec)});
+    const ok=new Set((j.ids||pend.map(r=>r.id)).map(String));
+    pend.forEach(r=>{if(ok.has(String(r.id)))r.synced=true});
+    swSave();swapRender();
+    if(!silent)smsg("ส่งขึ้นชีตแล้ว "+pend.length+" รายการ","m-ok");
+  }catch(e){if(!silent)smsg("ส่งขึ้นชีตไม่สำเร็จ: "+errMsg(e)+" (เก็บไว้ในเครื่อง ส่งซ้ำได้ภายหลัง)","m-warn")}
+  updSyncStatus();
+}
+function delRemote(r){if(r&&r.synced===true&&cfgOK())postSync({action:"del",id:r.id}).catch(()=>smsg("ลบในเครื่องแล้ว แต่ลบในชีตไม่สำเร็จ ให้ลบในชีตเอง","m-warn"))}
+function loadCfgUI(){const c=syncCfg();$("sUrl").value=c.url;$("sCode").value=c.code;$("sBy").value=c.by}
+$("sCfgSave").onclick=async()=>{
+  const u=$("sUrl").value.trim(),c=$("sCode").value.trim(),b=$("sBy").value.trim();
+  try{localStorage.setItem("mcsyncurl",u);localStorage.setItem("mcsynccode",c);localStorage.setItem("mcsyncby",b)}catch(e){}
+  if(!u||!c){smsg("บันทึกการตั้งค่าแล้ว (ยังไม่เชื่อมข้อมูลทีม ต้องมีทั้งลิงก์และรหัสทีม)","m-warn");updSyncStatus();return}
+  try{await postSync({action:"ping"});smsg("เชื่อมต่อสำเร็จ","m-ok");syncPending(true)}
+  catch(e){smsg("เชื่อมต่อไม่สำเร็จ: "+errMsg(e),"m-bad")}
+  updSyncStatus();
+};
+$("sSyncNow").onclick=()=>syncPending(false);
+twoTap("sSyncOld","⬆️ ส่งรายการเก่าทั้งหมดขึ้นชีต",()=>{swapList.forEach(r=>{if(!r.id)r.id=newId();if(r.synced===undefined)r.synced=false});swSave();syncPending(false)});
+async function loadTeam(){
+  const info=$("sSrcInfo");info.textContent="กำลังโหลดข้อมูลทีม...";
+  try{
+    const j=await postSync({action:"list"});
+    teamList=(j.rows||[]).map(r=>Object.assign({},r,{cause:r.cause||"",note:r.note||""}));
+    info.textContent="ข้อมูลทั้งทีม "+teamList.length+" รายการ · โหลดเมื่อ "+nowStr().slice(11,16);
+  }catch(e){info.textContent="โหลดข้อมูลทีมไม่สำเร็จ: "+errMsg(e);teamList=[]}
+  sumRender();
+}
+$("sSrc").onchange=()=>{
+  srcMode=$("sSrc").value;const t=srcMode==="team";
+  $("sTeamReload").classList.toggle("hide",!t);$("sTeamExp").classList.toggle("hide",!t);$("sSrcInfo").textContent="";
+  if(t){if(!cfgOK()){$("sSrcInfo").textContent="ยังไม่ได้เชื่อมข้อมูลทีม ดูหัวข้อ ⚙️ ด้านล่างสุดของหน้านี้";teamList=[];sumRender()}else loadTeam()}
+  else sumRender();
+};
+$("sTeamReload").onclick=loadTeam;
+$("sTeamExp").onclick=async()=>{
+  const v=$("sMon").value;
+  const L=teamList.filter(r=>v==="ALL"||monKey(r)===v);
+  if(!L.length){smsg("ไม่มีรายการให้ส่งออก","m-warn");return}
+  const num=x=>(x!==""&&x!=null&&!isNaN(Number(x)))?Number(x):x;
+  const aoa=[["ลำดับ","วันที่สับเปลี่ยน","เลขมิเตอร์เดิม","ขนาดเดิม","หน่วยเดิม","สาเหตุที่ชำรุด","เลขมิเตอร์ใหม่","ขนาดใหม่","หน่วยใหม่","ผู้บันทึก","บันทึกเมื่อ"]].concat(L.map((r,i)=>[i+1,fmtDate(r.date),r.old,r.oldSz||"",num(r.oldRd),causeText(r),r.nw,r.newSz||"",num(r.newRd),r.by||"",r.time||""]));
+  const res=await saveXlsx(aoa,[8,14,18,12,12,28,18,12,12,14,20],"swap-team-","ข้อมูลทีม");
+  const bad=res==="fail"||res==="declined";
+  smsg(res==="declined"?"ยกเลิกการบันทึก":res==="fail"?"บันทึกไฟล์ไม่สำเร็จ":"ส่งออกข้อมูลทีมแล้ว ("+L.length+" รายการ)",bad?"m-warn":"m-ok");
+};
 $("sSumExp").onclick=async()=>{
-  if(!swapList.length){smsg("ยังไม่มีข้อมูลให้สรุป","m-warn");return}
-  const keys=[...new Set(swapList.map(r=>monKey(r)||"ไม่ระบุ"))].sort();
+  if(!curSrc().length){smsg("ยังไม่มีข้อมูลให้สรุป","m-warn");return}
+  const keys=[...new Set(curSrc().map(r=>monKey(r)||"ไม่ระบุ"))].sort();
   const cols=CAUSES.concat(["ไม่ระบุสาเหตุ"]);
   const cnt=(L,c)=>L.filter(r=>c==="ไม่ระบุสาเหตุ"?!r.cause:r.cause===c).length;
   const aoa=[["เดือน","รวม"].concat(cols)];
-  keys.forEach(k=>{const L=swapList.filter(r=>(monKey(r)||"ไม่ระบุ")===k);aoa.push([k==="ไม่ระบุ"?k:monLabel(k),L.length].concat(cols.map(c=>cnt(L,c))))});
-  aoa.push(["รวมทั้งหมด",swapList.length].concat(cols.map(c=>cnt(swapList,c))));
+  keys.forEach(k=>{const L=curSrc().filter(r=>(monKey(r)||"ไม่ระบุ")===k);aoa.push([k==="ไม่ระบุ"?k:monLabel(k),L.length].concat(cols.map(c=>cnt(L,c))))});
+  aoa.push(["รวมทั้งหมด",curSrc().length].concat(cols.map(c=>cnt(curSrc(),c))));
   const res=await saveXlsx(aoa,[18,8].concat(cols.map(()=>16)),"swap-summary-","สรุปรายเดือน");
   const bad=res==="fail"||res==="declined";
   smsg(res==="declined"?"ยกเลิกการบันทึก":res==="fail"?"บันทึกไฟล์ไม่สำเร็จ":"ส่งออกสรุปแล้ว",bad?"m-warn":"m-ok");
