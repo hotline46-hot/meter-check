@@ -86,6 +86,13 @@ input[type=text]{box-sizing:border-box;width:100%;min-width:0}
 .it{word-break:break-all}
 #cols .row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 #cols select{width:100%;box-sizing:border-box}
+.phbtn{display:flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:8px 12px;border-radius:12px;background:linear-gradient(135deg,#6b2d8f,#8a3fb5);color:#fff;font-weight:600;border-bottom:4px solid #3b0f63;cursor:pointer;text-align:center;box-sizing:border-box}
+.phbtn.sec{background:transparent;color:var(--ac);border:1px solid var(--ac);border-bottom:4px solid var(--bd)}
+.phimg{width:100%;max-height:240px;object-fit:contain;border-radius:12px;border:2px solid var(--bd);background:var(--bg);cursor:zoom-in;display:block;margin-bottom:8px}
+.thm{width:46px;height:46px;object-fit:cover;border-radius:8px;border:1px solid var(--bd);margin:0 6px 0 0;vertical-align:middle}
+#pv{display:none;position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.9);align-items:center;justify-content:center;padding:12px}
+#pv.on{display:flex}#pv img{max-width:100%;max-height:100%;object-fit:contain}
+.it.editing{background:rgba(242,183,5,.18);border-radius:10px;padding-left:6px}
 </style>
 </head>
 <body>
@@ -222,25 +229,35 @@ input[type=text]{box-sizing:border-box;width:100%;min-width:0}
 </div>
 </div>
 <div id="sec2" class="hide">
-<div class="card"><h2>🔧 งานสับเปลี่ยน · มิเตอร์ชำรุด</h2>
-<div style="font-size:14px;color:var(--mu)">กรอกข้อมูลมิเตอร์เดิมและมิเตอร์ใหม่ แล้วกดบันทึก เมื่อครบส่งออก Excel ได้</div>
+<div class="mtabs" id="kindTabs" style="margin-top:4px"><button data-k="defect" class="on"><span>🔴</span>มิเตอร์ชำรุด</button><button data-k="periodic"><span>📅</span>มิเตอร์ตามวาระ</button></div>
+<div class="card"><h2 id="sTitle">🔧 งานสับเปลี่ยน · มิเตอร์ชำรุด</h2>
+<div id="sEditBar" class="hide" style="margin:0 0 10px;padding:10px;border-radius:12px;border:2px solid var(--gold);background:var(--bg)"><div style="font-weight:700">✏️ กำลังแก้ไขรายการที่ <span id="sEditNo"></span></div><div style="font-size:13px;color:var(--mu)">แก้ไขแล้วกด “บันทึกการแก้ไข” ด้านล่าง</div><button id="sEditCancel" class="sec" style="margin-top:8px;width:100%">ยกเลิกการแก้ไข</button></div>
+<div id="sHint" style="font-size:14px;color:var(--mu)">กรอกข้อมูลมิเตอร์เดิมและมิเตอร์ใหม่ แล้วกดบันทึก เมื่อครบส่งออก Excel ได้</div>
 <label style="margin-top:12px">📅 วันที่สับเปลี่ยน (วัน/เดือน/ปี) *</label>
 <input type="date" id="sDate" style="width:100%;box-sizing:border-box;padding:10px 12px;border-radius:12px;border:1px solid var(--bd);background:var(--card);color:var(--tx);font:inherit;color-scheme:light dark">
 </div>
-<div class="card"><h2>🔴 มิเตอร์เดิม (ชำรุด)</h2>
+<div class="card"><h2 id="sOldTitle">🔴 มิเตอร์เดิม (ชำรุด)</h2>
 <label>CA / หมายเลขผู้ใช้ไฟ (ไม่กรอกก็ได้)</label>
 <input type="text" id="sCA" inputmode="numeric" autocomplete="off">
 <label style="margin-top:8px">เลขมิเตอร์เดิม *</label>
 <input type="text" id="sOld" autocapitalize="characters" autocomplete="off">
 <div class="row" style="margin-top:8px"><div><label>ขนาดมิเตอร์</label><select id="sOldSz"></select></div><div><label>หน่วยมิเตอร์ (kWh)</label><input type="text" id="sOldRd" inputmode="decimal" autocomplete="off"></div></div>
-<label style="margin-top:8px">สาเหตุที่ชำรุด *</label>
+<div id="sCauseBox"><label style="margin-top:8px">สาเหตุที่ชำรุด *</label>
 <select id="sCause" style="width:100%"></select>
-<input type="text" id="sCauseNote" class="hide" placeholder="ระบุสาเหตุ / ความคิดเห็น" autocomplete="off" style="margin-top:8px">
+<input type="text" id="sCauseNote" class="hide" placeholder="ระบุสาเหตุ / ความคิดเห็น" autocomplete="off" style="margin-top:8px"></div>
+<div id="sPerBox" class="hide"><label style="margin-top:8px">หมายเหตุ (ไม่กรอกก็ได้)</label><input type="text" id="sPerNote" autocomplete="off"></div>
+
 </div>
 <div class="card"><h2>🟢 มิเตอร์ใหม่</h2>
 <label>เลขมิเตอร์ใหม่ *</label>
 <input type="text" id="sNew" autocapitalize="characters" autocomplete="off">
 <div class="row" style="margin-top:8px"><div><label>ขนาดมิเตอร์</label><select id="sNewSz"></select></div><div><label>หน่วยมิเตอร์ (kWh)</label><input type="text" id="sNewRd" inputmode="decimal" autocomplete="off"></div></div>
+
+</div>
+<div class="card phwrap"><h2>📷 รูปมิเตอร์คู่กัน (เก่า + ใหม่)</h2>
+<div style="font-size:14px;color:var(--mu)">ถ่ายมิเตอร์เก่าและมิเตอร์ใหม่ให้อยู่ในรูปเดียวกัน เห็นเลขมิเตอร์ชัด เพื่อกลับมาตรวจข้อมูลที่กรอกตกหล่นได้</div>
+<div class="row" style="margin-top:8px"><label class="phbtn">📷 ถ่ายรูป<input type="file" accept="image/*" capture="environment" id="phPairIn" hidden></label><label class="phbtn sec">🖼️ เลือกจากแกลเลอรี<input type="file" accept="image/*" id="phPairGal" hidden></label></div>
+<div id="phPairPv" class="hide" style="margin-top:8px"><img id="phPairImg" class="phimg" alt=""><button id="phPairDel" class="sec" style="width:100%">🗑️ ลบรูปนี้</button></div>
 </div>
 <div class="card">
 <div class="row"><button id="sSave" class="big">💾 บันทึกรายการ</button></div>
@@ -257,6 +274,7 @@ input[type=text]{box-sizing:border-box;width:100%;min-width:0}
 <div class="row" style="margin-top:8px"><button id="sTeamReload" class="sec hide">🔄 โหลดข้อมูลทีมใหม่</button><button id="sTeamExp" class="sec hide">📤 ส่งออกรายการของทีม (Excel)</button></div></div>
 <div class="card"><h2>📋 รายการที่บันทึก</h2>
 <div class="xp"><div class="xpb" style="width:100%"></div><span><b id="sCnt">0</b>&nbsp;รายการ</span></div>
+<div style="font-size:13px;color:var(--mu);margin:-2px 0 6px">แตะที่รายการเพื่อแก้ไขย้อนหลัง</div>
 <div id="sList" class="list"></div>
 <div class="row" style="margin-top:10px"><button id="sExp">📤 ส่งออก Excel</button><button id="sCopy" class="sec">คัดลอกรายการ</button></div>
 <div class="row" style="margin-top:8px"><button id="sUndo" class="sec">ลบตัวล่าสุด</button><button id="sWipe" class="sec">ล้างทั้งหมด</button></div>
@@ -273,11 +291,12 @@ input[type=text]{box-sizing:border-box;width:100%;min-width:0}
 <input type="text" id="sBy" autocomplete="off">
 <div class="row" style="margin-top:10px"><button id="sCfgSave">💾 บันทึกการตั้งค่า</button></div>
 <div class="row" style="margin-top:8px"><button id="sSyncNow" class="sec">🔄 ส่งข้อมูลที่ค้าง</button><button id="sSyncOld" class="sec">⬆️ ส่งรายการเก่าทั้งหมดขึ้นชีต</button></div>
-<div style="font-size:13px;color:var(--mu);margin-top:10px">ส่งขึ้นชีตเฉพาะ: วันที่ เลขมิเตอร์เดิม/ใหม่ ขนาด หน่วย สาเหตุ และชื่อผู้บันทึก <b>ไม่ส่ง CA</b> (CA ยังอยู่ในเครื่องและในไฟล์ Excel ที่ส่งออกจากเครื่องนี้)</div>
+<div style="font-size:13px;color:var(--mu);margin-top:10px">ส่งขึ้นชีตเฉพาะ: วันที่ เลขมิเตอร์เดิม/ใหม่ ขนาด หน่วย สาเหตุ และชื่อผู้บันทึก <b>ไม่ส่ง CA</b> (CA ยังอยู่ในเครื่องและในไฟล์ Excel ที่ส่งออกจากเครื่องนี้) · รูปมิเตอร์คู่ (ทั้งสองหมวด) จะอัปโหลดเข้าโฟลเดอร์ใน Google Drive ของเจ้าของสคริปต์</div>
 </div></details>
 </div>
 </main>
 
+<div id="pv"><img alt=""></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
 <script>
@@ -440,6 +459,26 @@ document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest
 function applyScanner(on){["start","stop","photoLbl"].forEach(id=>{$(id).style.display=on?"none":""});$("ready").classList.toggle("hide",!on);try{localStorage.setItem("mcscan",on?"1":"0")}catch(e){}}
 $("scn").onchange=()=>applyScanner($("scn").checked);
 let swapList=[];
+let swKind="defect",editId=null,phCur={pair:null},phChg={pair:false},phUrls={pair:null},thmUrls=[];
+const PHOTO_REQUIRED=false; // เปลี่ยนเป็น true ถ้าต้องการบังคับถ่ายรูปคู่ก่อนบันทึก (ทั้งสองหมวด)
+const SLOTS=["pair"],PHC={pair:"Pair"},PHT={pair:"คู่"};
+const kindOf=r=>r.kind||"defect";
+let _db=null;
+function idb(){return _db||(_db=new Promise((res,rej)=>{const q=indexedDB.open("mcphotos",1);q.onupgradeneeded=()=>q.result.createObjectStore("p");q.onsuccess=()=>res(q.result);q.onerror=()=>{_db=null;rej(q.error)}}))}
+function blobBuf(b){return new Promise((res,rej)=>{const f=new FileReader();f.onload=()=>res(f.result);f.onerror=()=>rej(new Error("อ่านรูปไม่ได้"));f.readAsArrayBuffer(b)})}
+function blobB64(b){return new Promise((res,rej)=>{const f=new FileReader();f.onload=()=>res(String(f.result).split(",")[1]||"");f.onerror=()=>rej(new Error("อ่านรูปไม่ได้"));f.readAsDataURL(b)})}
+async function idbPut(k,blob){const buf=await blobBuf(blob);const db=await idb();return new Promise((res,rej)=>{const x=db.transaction("p","readwrite");x.objectStore("p").put({b:buf,t:blob.type||"image/jpeg"},k);x.oncomplete=()=>res();x.onerror=()=>rej(x.error);x.onabort=()=>rej(x.error)})}
+async function idbGet(k){const db=await idb();return new Promise((res,rej)=>{const q=db.transaction("p").objectStore("p").get(k);q.onsuccess=()=>{const v=q.result;res(v?new Blob([v.b],{type:v.t}):null)};q.onerror=()=>rej(q.error)})}
+async function idbDel(k){const db=await idb();return new Promise((res,rej)=>{const x=db.transaction("p","readwrite");x.objectStore("p").delete(k);x.oncomplete=()=>res();x.onerror=()=>rej(x.error)})}
+function dropPhotos(r){SLOTS.forEach(s=>{idbDel(r.id+":"+s).catch(()=>{})})}
+function compressImg(file,max,q){return new Promise((res,rej)=>{const u=URL.createObjectURL(file),im=new Image();im.onload=()=>{try{let w=im.naturalWidth,h=im.naturalHeight;const k=Math.min(1,max/Math.max(w,h));w=Math.round(w*k);h=Math.round(h*k);const c=document.createElement("canvas");c.width=w;c.height=h;c.getContext("2d").drawImage(im,0,0,w,h);c.toBlob(b=>{URL.revokeObjectURL(u);b?res(b):rej(new Error("แปลงรูปไม่สำเร็จ"))},"image/jpeg",q)}catch(e){URL.revokeObjectURL(u);rej(e)}};im.onerror=()=>{URL.revokeObjectURL(u);rej(new Error("เปิดรูปไม่ได้"))};im.src=u})}
+function openPv(b){if(!b)return;const u=URL.createObjectURL(b),pv=$("pv");pv.firstElementChild.src=u;pv.classList.add("on");pv.onclick=()=>{pv.classList.remove("on");URL.revokeObjectURL(u)}}
+function showPh(s){
+  const c=PHC[s],im=$("ph"+c+"Img"),pv=$("ph"+c+"Pv");
+  if(phUrls[s]){URL.revokeObjectURL(phUrls[s]);phUrls[s]=null}
+  if(phCur[s]){phUrls[s]=URL.createObjectURL(phCur[s]);im.src=phUrls[s];pv.classList.remove("hide")}
+  else{im.removeAttribute("src");pv.classList.add("hide")}
+}
 const SIZES=["5(15)","15(45)","30(100)","5(100)","TOU 5(45)","TOU 5(100)"];
 function swSave(){try{localStorage.setItem("mcswap",JSON.stringify(swapList))}catch(e){}}
 function smsg(t,c){const m=$("sMsg");m.className=c;m.textContent=({"m-ok":"✅ ","m-bad":"❌ ","m-warn":"⚠️ "}[c]||"")+t;m.style.cssText="display:block;margin-top:10px;padding:12px;border-radius:14px;text-align:center;font-weight:700;font-size:17px";beep(c)}
@@ -462,34 +501,90 @@ const TH_M=["มกราคม","กุมภาพันธ์","มีนา�
 function monLabel(k){const m=String(k).match(/^(\d{4})-(\d{2})$/);return m?TH_M[+m[2]-1]+" "+(+m[1]+543):k}
 function monKey(r){return (r.date||"").slice(0,7)}
 function sumRender(){
-  const keys=[...new Set(curSrc().map(monKey).filter(Boolean))].sort().reverse();
+  const per=swKind==="periodic",SRC=curSrc();
+  const keys=[...new Set(SRC.map(monKey).filter(Boolean))].sort().reverse();
   const sel=$("sMon"),cur=sel.value;
   sel.innerHTML='<option value="ALL">ทั้งหมด</option>'+keys.map(k=>'<option value="'+k+'">'+monLabel(k)+'</option>').join("");
   sel.value=(cur&&(cur==="ALL"||keys.includes(cur)))?cur:(keys[0]||"ALL");
   const v=sel.value;
-  const L=v==="ALL"?curSrc():curSrc().filter(r=>monKey(r)===v);
+  const L=v==="ALL"?SRC:SRC.filter(r=>monKey(r)===v);
   const by={},bs={};
-  L.forEach(r=>{const c=r.cause||"ไม่ระบุสาเหตุ";by[c]=(by[c]||0)+1;const z=r.oldSz||"ไม่ระบุขนาด";bs[z]=(bs[z]||0)+1});
+  L.forEach(r=>{if(!per){const c=r.cause||"ไม่ระบุสาเหตุ";by[c]=(by[c]||0)+1}const z=r.oldSz||"ไม่ระบุขนาด";bs[z]=(bs[z]||0)+1});
   const rc=Object.entries(by).sort((a,b)=>b[1]-a[1]);
   const max=rc.length?rc[0][1]:1;
   let h='<div style="text-align:center;margin:6px 0"><span style="font-size:34px;font-weight:800">'+L.length+'</span> รายการ</div>';
-  if(rc.length){
-    h+=rc.map(([c,n])=>'<div style="margin:8px 0"><div style="display:flex;justify-content:space-between;gap:8px;font-size:15px"><span>'+esc(c)+'</span><b style="white-space:nowrap">'+n+' ('+Math.round(n/L.length*100)+'%)</b></div><div class="xp" style="height:12px;margin:4px 0 0"><div class="xpb" style="width:'+Math.round(n/max*100)+'%"></div></div></div>').join("");
-    const notes=L.filter(r=>r.cause==="อื่น ๆ"&&r.note).map(r=>r.note);
-    if(notes.length)h+='<div style="font-size:13px;color:var(--mu);margin-top:6px">อื่น ๆ: '+esc(notes.join(" · "))+'</div>';
+  if(L.length){
+    if(!per){
+      h+=rc.map(([c,n])=>'<div style="margin:8px 0"><div style="display:flex;justify-content:space-between;gap:8px;font-size:15px"><span>'+esc(c)+'</span><b style="white-space:nowrap">'+n+' ('+Math.round(n/L.length*100)+'%)</b></div><div class="xp" style="height:12px;margin:4px 0 0"><div class="xpb" style="width:'+Math.round(n/max*100)+'%"></div></div></div>').join("");
+      const notes=L.filter(r=>r.cause==="อื่น ๆ"&&r.note).map(r=>r.note);
+      if(notes.length)h+='<div style="font-size:13px;color:var(--mu);margin-top:6px">อื่น ๆ: '+esc(notes.join(" · "))+'</div>';
+    }
     h+='<div style="font-size:14px;margin-top:10px"><b>ขนาดมิเตอร์เดิม:</b> '+Object.entries(bs).sort((a,b)=>b[1]-a[1]).map(([z,n])=>esc(z)+" "+n).join(" · ")+'</div>';
   }else h+='<div style="color:var(--mu);text-align:center">ยังไม่มีข้อมูล</div>';
   $("sSum").innerHTML=h;
 }
+async function fillThumbs(){
+  const ims=[...document.querySelectorAll("#sList img[data-k]")];
+  for(const im of ims){try{const b=await idbGet(im.dataset.k);if(b&&im.isConnected){const u=URL.createObjectURL(b);thmUrls.push(u);im.src=u}else im.remove()}catch(e){im.remove()}}
+}
 function swapRender(){
-  $("sCnt").textContent=swapList.length;
+  const per=swKind==="periodic";
+  const KL=swapList.map((r,i)=>({r,i})).filter(o=>kindOf(o.r)===swKind);
+  $("sCnt").textContent=KL.length;
   sumRender();
-  $("sList").innerHTML=swapList.length?swapList.map((r,i)=>({r,i})).reverse().map(o=>{
-    const r=o.r;
+  thmUrls.forEach(u=>URL.revokeObjectURL(u));thmUrls=[];
+  $("sList").innerHTML=KL.length?KL.map((o,n)=>({o,n})).reverse().map(x=>{
+    const r=x.o.r,i=x.o.i;
     const d1="📅 "+fmtDate(r.date)+" · "+(r.ca?"CA "+esc(r.ca)+" · ":"")+"เดิม "+esc(r.oldSz||"-")+" · "+esc(r.oldRd||"-")+" หน่วย";
     const d2="ใหม่ "+esc(r.newSz||"-")+" · "+esc(r.newRd||"-")+" หน่วย";
-    return '<div class="it" style="display:flex;gap:8px;align-items:center"><div style="flex:1;min-width:0">'+(o.i+1)+". "+esc(r.old)+" → "+esc(r.nw)+(r.synced?" ☁️":"")+"<small>"+d1+"<br>"+d2+"<br>🛠️ "+esc(causeText(r))+"</small></div>"+'<button class="sec sdel" data-i="'+o.i+'" style="min-height:36px;padding:4px 10px;flex:0 0 auto">🗑️</button></div>';
+    let d3;
+    const hp=(r.ph&&r.ph.pair)?"✓":"✗";
+    if(per)d3="📷 รูปคู่ "+hp+(r.note?"<br>📝 "+esc(r.note):"");
+    else d3="🛠️ "+esc(causeText(r))+"<br>📷 รูปคู่ "+hp;
+    const th=(r.ph&&r.ph.pair)?'<img class="thm" alt="" data-k="'+esc(r.id)+':pair">':"";
+    return '<div class="it'+(r.id===editId?" editing":"")+'" data-i="'+i+'" style="display:flex;gap:8px;align-items:center"><div style="flex:1;min-width:0;cursor:pointer">'+(x.n+1)+". "+esc(r.old)+" → "+esc(r.nw)+(r.synced?" ☁️":(cfgOK()?" 🟠":""))+(th?'<div style="margin-top:4px">'+th+"</div>":"")+"<small>"+d1+"<br>"+d2+"<br>"+d3+"</small></div>"+'<button class="sec sdel" data-i="'+i+'" style="min-height:36px;padding:4px 10px;flex:0 0 auto">🗑️</button></div>';
   }).join(""):'<div class="it" style="color:var(--mu)">ยังไม่มีรายการ กรอกข้อมูลด้านบนแล้วกดบันทึก</div>';
+  fillThumbs();
+}
+function resetForm(){
+  ["sCA","sOld","sOldRd","sNew","sNewRd","sOldSz","sNewSz","sCause","sCauseNote","sPerNote"].forEach(id=>{$(id).value=""});
+  $("sCauseNote").classList.add("hide");
+  phCur={pair:null};phChg={pair:false};showPh("pair");
+  editId=null;$("sEditBar").classList.add("hide");$("sSave").textContent="💾 บันทึกรายการ";
+  document.querySelectorAll("#sList .editing").forEach(e=>e.classList.remove("editing"));
+}
+function setKind(k){
+  if(editId){resetForm();$("sDate").value=todayISO()}
+  swKind=k;const per=k==="periodic";
+  document.querySelectorAll("#kindTabs button").forEach(b=>b.classList.toggle("on",b.dataset.k===k));
+  $("sTitle").textContent=per?"📅 งานสับเปลี่ยน · มิเตอร์ตามวาระ":"🔧 งานสับเปลี่ยน · มิเตอร์ชำรุด";
+  $("sOldTitle").textContent=per?"🔴 มิเตอร์เดิม (ครบวาระ)":"🔴 มิเตอร์เดิม (ชำรุด)";
+  $("sHint").textContent=per?"กรอกข้อมูลและถ่ายรูปมิเตอร์คู่ (เก่า+ใหม่) ไว้ด้วย เพื่อกลับมาตรวจแก้ข้อมูลที่กรอกตกหล่นได้":"กรอกข้อมูลมิเตอร์เดิมและมิเตอร์ใหม่ พร้อมถ่ายรูปมิเตอร์คู่ แล้วกดบันทึก เมื่อครบส่งออก Excel ได้";
+  $("sCauseBox").classList.toggle("hide",per);$("sPerBox").classList.toggle("hide",!per);
+  $("sMsg").style.display="none";
+  try{localStorage.setItem("mcswk",k)}catch(e){}
+  swapRender();
+}
+function ensureOpt(id,v){const s=$(id);if(v&&![...s.options].some(o=>o.value===v)){const o=document.createElement("option");o.textContent=v;s.appendChild(o)}s.value=v||""}
+async function startEdit(i){
+  const r=swapList[i];if(!r)return;
+  if(kindOf(r)!==swKind)setKind(kindOf(r));
+  resetForm();editId=r.id;
+  $("sDate").value=r.date||todayISO();
+  $("sCA").value=r.ca||"";$("sOld").value=r.old||"";$("sOldRd").value=r.oldRd||"";$("sNew").value=r.nw||"";$("sNewRd").value=r.newRd||"";
+  ensureOpt("sOldSz",r.oldSz);ensureOpt("sNewSz",r.newSz);
+  for(const s of SLOTS)if(r.ph&&r.ph[s]){try{phCur[s]=await idbGet(r.id+":"+s)}catch(e){}}
+  showPh("pair");
+  if(kindOf(r)==="periodic"){
+    $("sPerNote").value=r.note||"";
+  }else{
+    $("sCause").value=r.cause||"";$("sCauseNote").value=r.note||"";$("sCauseNote").classList.toggle("hide",r.cause!=="อื่น ๆ");
+  }
+  const no=swapList.filter(x=>kindOf(x)===swKind).indexOf(r)+1;
+  $("sEditNo").textContent=no+" ("+r.old+")";$("sEditBar").classList.remove("hide");$("sSave").textContent="💾 บันทึกการแก้ไข";
+  $("sMsg").style.display="none";
+  document.querySelectorAll("#sList .it").forEach(e=>e.classList.toggle("editing",+e.dataset.i===i));
+  $("sTitle").scrollIntoView({behavior:"smooth",block:"start"});
 }
 function swapInit(){
   $("sMon").onchange=sumRender;
@@ -501,9 +596,33 @@ function swapInit(){
   swapList.forEach(r=>{if(!r.id)r.id=newId()});loadCfgUI();updSyncStatus();setTimeout(()=>syncPending(true),800);
   const chain=["sCA","sOld","sOldRd","sNew","sNewRd"];
   chain.forEach((id,i)=>$(id).addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();if(i<chain.length-1)$(chain[i+1]).focus();else $("sSave").onclick()}}));
-  swapRender();
+  document.querySelectorAll("#kindTabs button").forEach(b=>b.onclick=()=>setKind(b.dataset.k));
+  SLOTS.forEach(s=>{
+    const c=PHC[s];
+    ["In","Gal"].forEach(x=>{$("ph"+c+x).onchange=async e=>{
+      const f=e.target.files[0];e.target.value="";if(!f)return;
+      try{phCur[s]=await compressImg(f,1920,.78);phChg[s]=true;showPh(s)}catch(err){smsg("ใช้รูปนี้ไม่ได้: "+err.message,"m-bad")}
+    }});
+    $("ph"+c+"Del").onclick=()=>{phCur[s]=null;phChg[s]=true;showPh(s)};
+    $("ph"+c+"Img").onclick=()=>openPv(phCur[s]);
+  });
+  $("sEditCancel").onclick=()=>{resetForm();$("sDate").value=todayISO()};
+  try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}catch(e){}
+  let k="defect";try{k=localStorage.getItem("mcswk")||"defect"}catch(e){}
+  setKind(k==="periodic"?"periodic":"defect");
 }
-$("sSave").onclick=()=>{
+function exportSpec(L,team){
+  const num=v=>(v!==""&&v!=null&&!isNaN(Number(v)))?Number(v):v;
+  const pl=r=>{const u=team?r.phPair:(r.phU&&r.phU.pair);return u||((!team&&r.ph&&r.ph.pair)?"มี (ยังไม่ส่งขึ้น Drive)":"-")};
+  if(swKind==="periodic"){
+    if(team)return {head:["ลำดับ","วันที่สับเปลี่ยน","เลขมิเตอร์เดิม","ขนาดเดิม","หน่วยเดิม","เลขมิเตอร์ใหม่","ขนาดใหม่","หน่วยใหม่","หมายเหตุ","รูปมิเตอร์คู่","ผู้บันทึก","บันทึกเมื่อ"],body:L.map((r,i)=>[i+1,fmtDate(r.date),r.old,r.oldSz||"",num(r.oldRd),r.nw,r.newSz||"",num(r.newRd),r.note||"",pl(r),r.by||"",r.time||""]),w:[8,14,18,12,12,18,12,12,24,45,14,20]};
+    return {head:["ลำดับ","วันที่สับเปลี่ยน","CA","เลขมิเตอร์เดิม","ขนาดเดิม","หน่วยเดิม","เลขมิเตอร์ใหม่","ขนาดใหม่","หน่วยใหม่","หมายเหตุ","รูปมิเตอร์คู่","วันเวลาที่บันทึก"],body:L.map((r,i)=>[i+1,fmtDate(r.date),r.ca||"",r.old,r.oldSz||"",num(r.oldRd),r.nw,r.newSz||"",num(r.newRd),r.note||"",pl(r),r.time||""]),w:[8,14,16,18,12,12,18,12,12,24,45,22]};
+  }
+  if(team)return {head:["ลำดับ","วันที่สับเปลี่ยน","เลขมิเตอร์เดิม","ขนาดเดิม","หน่วยเดิม","สาเหตุที่ชำรุด","เลขมิเตอร์ใหม่","ขนาดใหม่","หน่วยใหม่","รูปมิเตอร์คู่","ผู้บันทึก","บันทึกเมื่อ"],body:L.map((r,i)=>[i+1,fmtDate(r.date),r.old,r.oldSz||"",num(r.oldRd),causeText(r),r.nw,r.newSz||"",num(r.newRd),pl(r),r.by||"",r.time||""]),w:[8,14,18,12,12,28,18,12,12,45,14,20]};
+  return {head:["ลำดับ","วันที่สับเปลี่ยน","CA","เลขมิเตอร์เดิม","ขนาดเดิม","หน่วยเดิม","สาเหตุที่ชำรุด","เลขมิเตอร์ใหม่","ขนาดใหม่","หน่วยใหม่","รูปมิเตอร์คู่","วันเวลาที่บันทึก"],body:L.map((r,i)=>[i+1,fmtDate(r.date),r.ca||"",r.old,r.oldSz||"",num(r.oldRd),causeText(r),r.nw,r.newSz||"",num(r.newRd),pl(r),r.time]),w:[8,14,16,18,12,12,28,18,12,12,45,22]};
+}
+$("sSave").onclick=async()=>{
+  const per=swKind==="periodic";
   const ca=$("sCA").value.trim(),old=cleanSw($("sOld").value),nw=cleanSw($("sNew").value);
   const oldRd=$("sOldRd").value.trim(),newRd=$("sNewRd").value.trim(),dt=$("sDate").value,cause=$("sCause").value,note=$("sCauseNote").value.trim();
   if(/^https?:/i.test(old)||/^https?:/i.test(nw)){smsg("นี่คือลิงก์ ไม่ใช่เลขมิเตอร์ ให้สแกนบาร์โค้ดแทน","m-bad");return}
@@ -511,60 +630,141 @@ $("sSave").onclick=()=>{
   if(!nw){smsg("กรุณากรอกเลขมิเตอร์ใหม่","m-bad");$("sNew").focus();return}
   if(old===nw){smsg("เลขมิเตอร์เดิมกับใหม่เหมือนกัน ตรวจอีกครั้ง","m-bad");return}
   if(!dt){smsg("กรุณาเลือกวันที่สับเปลี่ยน","m-bad");$("sDate").focus();return}
-  if(!cause){smsg("กรุณาเลือกสาเหตุที่ชำรุด","m-bad");$("sCause").focus();return}
+  if(!per&&!cause){smsg("กรุณาเลือกสาเหตุที่ชำรุด","m-bad");$("sCause").focus();return}
   if((oldRd&&isNaN(Number(oldRd)))||(newRd&&isNaN(Number(newRd)))){smsg("หน่วยมิเตอร์ต้องเป็นตัวเลข","m-bad");return}
-  if(swapList.some(r=>r.old===old)){smsg("มิเตอร์เดิมเลขนี้บันทึกไว้แล้ว","m-warn");return}
-  if(swapList.some(r=>r.nw===nw)){smsg("มิเตอร์ใหม่เลขนี้ถูกใช้ในรายการอื่นแล้ว","m-warn");return}
-  swapList.push({id:newId(),synced:false,date:dt,cause,note:cause==="อื่น ๆ"?note:"",ca,old,oldSz:$("sOldSz").value,oldRd,nw,newSz:$("sNewSz").value,newRd,time:nowStr()});
+  const ed=editId?swapList.find(r=>r.id===editId):null;
+  const others=swapList.filter(r=>r!==ed);
+  if(others.some(r=>r.old===old)){smsg("มิเตอร์เดิมเลขนี้บันทึกไว้แล้ว","m-warn");return}
+  if(others.some(r=>r.nw===nw)){smsg("มิเตอร์ใหม่เลขนี้ถูกใช้ในรายการอื่นแล้ว","m-warn");return}
+  if(PHOTO_REQUIRED&&!phCur.pair){smsg("กรุณาถ่ายรูปมิเตอร์คู่ (เก่า+ใหม่) ก่อนบันทึก","m-bad");return}
+  const rec=ed||{id:newId(),time:nowStr()};
+  Object.assign(rec,{kind:swKind,synced:false,rev:(rec.rev||0)+1,date:dt,cause:per?"":cause,note:per?$("sPerNote").value.trim():(cause==="อื่น ๆ"?note:""),ca,old,oldSz:$("sOldSz").value,oldRd,nw,newSz:$("sNewSz").value,newRd});
+  rec.ph=rec.ph||{};rec.phU=rec.phU||{};rec.phD=rec.phD||{};rec.phV=rec.phV||{};rec.trash=rec.trash||[];
+  let phErr=false;
+  for(const s of SLOTS){
+    if(!phChg[s])continue;
+    rec.phV[s]=(rec.phV[s]||0)+1;
+    try{
+      if(phCur[s]){await idbPut(rec.id+":"+s,phCur[s]);rec.ph[s]=true;rec.phD[s]=true}
+      else{await idbDel(rec.id+":"+s);if(rec.phU[s])rec.trash.push(rec.phU[s]);rec.phU[s]="";rec.ph[s]=false;rec.phD[s]=false}
+    }catch(e){phErr=true}
+  }
+  if(!ed)swapList.push(rec);
   swSave();
-  ["sCA","sOld","sOldRd","sNew","sNewRd","sCause","sCauseNote"].forEach(id=>{$(id).value=""});$("sCauseNote").classList.add("hide");
-  smsg("บันทึกแล้ว "+old+" → "+nw+" (รายการที่ "+swapList.length+")","m-ok");
+  const was=!!ed,no=swapList.filter(r=>kindOf(r)===swKind).indexOf(rec)+1;
+  const miss=rec.ph.pair?[]:["pair"];
+  resetForm();if(was)$("sDate").value=todayISO();
+  const head=(was?"แก้ไขแล้ว ":"บันทึกแล้ว ")+old+" → "+nw+" (รายการที่ "+no+")";
+  if(phErr)smsg(head+" แต่เก็บรูปในเครื่องไม่ได้ ลองถ่ายใหม่","m-warn");
+  else if(miss.length)smsg(head+" · ยังไม่มีรูปมิเตอร์คู่","m-warn");
+  else smsg(head,"m-ok");
   swapRender();$("sCA").focus();syncPending(true);
 };
-$("sClr").onclick=()=>{["sCA","sOld","sOldRd","sNew","sNewRd","sOldSz","sNewSz","sCause","sCauseNote"].forEach(id=>{$(id).value=""});$("sCauseNote").classList.add("hide");$("sMsg").style.display="none"};
-$("sList").onclick=e=>{const b=e.target.closest(".sdel");if(!b)return;const rr=swapList.splice(+b.dataset.i,1)[0];swSave();swapRender();delRemote(rr)};
-$("sUndo").onclick=()=>{if(swapList.length){const x=swapList.pop();swSave();swapRender();smsg("ลบแล้ว: "+x.old,"m-warn");delRemote(x)}};
-twoTap("sWipe","ล้างทั้งหมด",()=>{swapList=[];swSave();swapRender();smsg("ล้างรายการในเครื่องแล้ว (ข้อมูลที่อยู่ในชีตไม่ถูกลบ)","m-warn")});
+$("sClr").onclick=()=>{resetForm();$("sMsg").style.display="none"};
+$("sList").onclick=e=>{
+  const b=e.target.closest(".sdel");
+  if(b){
+    const r=swapList[+b.dataset.i];if(!r)return;
+    if(r.ph&&(r.ph.old||r.ph.nw)&&!confirm("ลบรายการ "+r.old+" พร้อมรูปที่เก็บไว้?"))return;
+    if(editId===r.id){resetForm()}
+    swapList.splice(+b.dataset.i,1);swSave();dropPhotos(r);swapRender();delRemote(r);return;
+  }
+  const it=e.target.closest(".it[data-i]");if(it)startEdit(+it.dataset.i);
+};
+$("sUndo").onclick=()=>{
+  let j=-1;for(let i=swapList.length-1;i>=0;i--)if(kindOf(swapList[i])===swKind){j=i;break}
+  if(j<0)return;
+  const x=swapList.splice(j,1)[0];if(editId===x.id)resetForm();
+  swSave();dropPhotos(x);swapRender();smsg("ลบแล้ว: "+x.old,"m-warn");delRemote(x);
+};
+twoTap("sWipe","ล้างทั้งหมด",()=>{
+  const gone=swapList.filter(r=>kindOf(r)===swKind);
+  gone.forEach(dropPhotos);swapList=swapList.filter(r=>kindOf(r)!==swKind);resetForm();swSave();swapRender();
+  smsg("ล้างรายการหมวดนี้ในเครื่องแล้ว (ข้อมูลที่อยู่ในชีตและรูปใน Drive ไม่ถูกลบ)","m-warn");
+});
 $("sExp").onclick=async()=>{
-  if(!swapList.length){smsg("ยังไม่มีรายการให้ส่งออก","m-warn");return}
-  const num=v=>(v!==""&&!isNaN(Number(v)))?Number(v):v;
-  const aoa=[["ลำดับ","วันที่สับเปลี่ยน","CA","เลขมิเตอร์เดิม","ขนาดเดิม","หน่วยเดิม","สาเหตุที่ชำรุด","เลขมิเตอร์ใหม่","ขนาดใหม่","หน่วยใหม่","วันเวลาที่บันทึก"]].concat(swapList.map((r,i)=>[i+1,fmtDate(r.date),r.ca||"",r.old,r.oldSz||"",num(r.oldRd),causeText(r),r.nw,r.newSz||"",num(r.newRd),r.time]));
-  const res=await saveXlsx(aoa,[8,14,16,18,12,12,28,18,12,12,22],"swap-","สับเปลี่ยน");
+  const L=swapList.filter(r=>kindOf(r)===swKind);
+  if(!L.length){smsg("ยังไม่มีรายการให้ส่งออก","m-warn");return}
+  const sp=exportSpec(L,false);
+  const res=await saveXlsx([sp.head].concat(sp.body),sp.w,swKind==="periodic"?"periodic-":"swap-",swKind==="periodic"?"มิเตอร์ตามวาระ":"สับเปลี่ยน");
   const bad=res==="fail"||res==="declined";
-  smsg(res==="declined"?"ยกเลิกการบันทึก":res==="fail"?"บันทึกไฟล์ไม่สำเร็จ ลองปุ่มคัดลอกรายการ":"ส่งออกแล้ว ("+swapList.length+" รายการ)",bad?"m-warn":"m-ok");
+  smsg(res==="declined"?"ยกเลิกการบันทึก":res==="fail"?"บันทึกไฟล์ไม่สำเร็จ ลองปุ่มคัดลอกรายการ":"ส่งออกแล้ว ("+L.length+" รายการ)",bad?"m-warn":"m-ok");
 };
 const SYNC_URL="https://script.google.com/macros/s/AKfycbw5klIJvnpqnNdZN3RIFdju9JriuEjUJFvtXfEZOuXc5q9EqntEdQN6hzqiRkIi2T92/exec";
 function newId(){try{if(crypto&&crypto.randomUUID)return crypto.randomUUID()}catch(e){}return Date.now().toString(36)+Math.random().toString(36).slice(2,10)}
 function syncCfg(){let u="",c="",b="";try{u=localStorage.getItem("mcsyncurl")||"";c=localStorage.getItem("mcsynccode")||"";b=localStorage.getItem("mcsyncby")||""}catch(e){}return {url:(u||SYNC_URL).trim(),code:c,by:b}}
 function cfgOK(){const c=syncCfg();return !!(c.url&&c.code)}
-function curSrc(){return srcMode==="team"?teamList:swapList}
+function curSrc(){return (srcMode==="team"?teamList:swapList).filter(r=>kindOf(r)===swKind)}
 let srcMode="local",teamList=[];
 async function postSync(payload){
   const c=syncCfg();if(!c.url||!c.code)throw new Error("ยังไม่ได้ตั้งค่า");
   const r=await fetch(c.url,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(Object.assign({code:c.code},payload))});
   const j=await r.json();if(!j.ok)throw new Error(j.error||"ผิดพลาด");return j;
 }
-function pubRec(r){return {id:r.id,time:r.time,date:r.date,old:r.old,oldSz:r.oldSz,oldRd:r.oldRd,cause:r.cause,note:r.note,nw:r.nw,newSz:r.newSz,newRd:r.newRd,by:syncCfg().by}}
+function pubRec(r){const u=r.phU||{};return {id:r.id,time:r.time,date:r.date,old:r.old,oldSz:r.oldSz,oldRd:r.oldRd,cause:r.cause,note:r.note,nw:r.nw,newSz:r.newSz,newRd:r.newRd,by:syncCfg().by,kind:kindOf(r),phPair:u.pair||"",trash:r.trash||[]}}
 function updSyncStatus(){
   const pend=swapList.filter(r=>r.synced===false).length;
   const t=cfgOK()?("🟢 เชื่อมข้อมูลทีมแล้ว"+(pend?" · 🟠 ค้างส่ง "+pend+" รายการ":" · ส่งครบแล้ว")):"⚪ ยังไม่ได้เชื่อมข้อมูลทีม (ข้อมูลเก็บในเครื่องนี้)";
   ["sSync","sSync2"].forEach(id=>{const el=$(id);if(el)el.textContent=t});
 }
-function errMsg(e){return e&&e.message==="Failed to fetch"?"ติดต่อชีตไม่ได้ (เช็กอินเทอร์เน็ต/ลิงก์ และใช้ได้เฉพาะเวอร์ชัน GitHub)":(e&&e.message)||"ผิดพลาด"}
+function errMsg(e){return e&&e.message==="Failed to fetch"?"ติดต่อชีตไม่ได้ (เช็กอินเทอร์เน็ต/ลิงก์ และใช้ได้เฉพาะเวอร์ชัน GitHub)":(e&&e.message==="คำสั่งไม่ถูกต้อง")?"สคริปต์ในชีตยังเป็นเวอร์ชันเก่า ให้วางโค้ด Apps Script ใหม่แล้ว Deploy เวอร์ชันใหม่":(e&&e.message)||"ผิดพลาด"}
+let syncing=false,syncAgain=false;
+async function uploadPhoto(r,s){
+  const b=await idbGet(r.id+":"+s);
+  if(!b){r.phD[s]=false;return}
+  const v=(r.phV&&r.phV[s])||0;
+  const data=await blobB64(b);
+  const nm=((r.date||"")+"_"+r.old+"_"+PHT[s]+"_"+String(r.id).slice(0,6)).replace(/[\\\/:*?"<>|\s]+/g,"-")+".jpg";
+  const j=await postSync({action:"photo",name:nm,data:data,prev:r.phU[s]||""});
+  r.phU[s]=j.url;
+  if(((r.phV&&r.phV[s])||0)===v)r.phD[s]=false;
+}
 async function syncPending(silent){
   if(!cfgOK()){updSyncStatus();return}
-  const pend=swapList.filter(r=>r.synced===false);
-  if(!pend.length){updSyncStatus();if(!silent)smsg("ไม่มีรายการค้างส่ง","m-ok");return}
+  if(syncing){syncAgain=true;return}
+  syncing=true;let total=0,fail=null;
   try{
-    const j=await postSync({action:"add",records:pend.map(pubRec)});
-    const ok=new Set((j.ids||pend.map(r=>r.id)).map(String));
-    pend.forEach(r=>{if(ok.has(String(r.id)))r.synced=true});
-    swSave();swapRender();
-    if(!silent)smsg("ส่งขึ้นชีตแล้ว "+pend.length+" รายการ","m-ok");
-  }catch(e){if(!silent)smsg("ส่งขึ้นชีตไม่สำเร็จ: "+errMsg(e)+" (เก็บไว้ในเครื่อง ส่งซ้ำได้ภายหลัง)","m-warn")}
+    do{
+      syncAgain=false;
+      const pend=swapList.filter(r=>r.synced===false);
+      if(!pend.length)break;
+      const ready=[];
+      for(const r of pend){
+        try{
+          r.ph=r.ph||{};r.phU=r.phU||{};r.phD=r.phD||{};
+          for(const s of SLOTS)if(r.phD[s])await uploadPhoto(r,s);
+          ready.push({r,rev:r.rev||0,tr:(r.trash||[]).slice()});
+        }catch(e){fail=e;break}
+      }
+      swSave();
+      if(ready.length){
+        try{
+          const j=await postSync({action:"add",records:ready.map(x=>pubRec(x.r))});
+          const ok=new Set((j.ids||ready.map(x=>x.r.id)).map(String));
+          ready.forEach(x=>{
+            if(!ok.has(String(x.r.id)))return;
+            x.r.rem=true;total++;
+            x.r.trash=(x.r.trash||[]).filter(u=>!x.tr.includes(u));
+            if((x.r.rev||0)===x.rev)x.r.synced=true;
+          });
+          swSave();
+        }catch(e){fail=fail||e}
+      }
+      swapRender();
+      if(fail)break;
+    }while(syncAgain);
+  }finally{syncing=false}
+  if(!silent){
+    if(fail)smsg("ส่งขึ้นชีตไม่สำเร็จ: "+errMsg(fail)+" (เก็บไว้ในเครื่อง ส่งซ้ำได้ภายหลัง)","m-warn");
+    else smsg(total?"ส่งขึ้นชีตแล้ว "+total+" รายการ":"ไม่มีรายการค้างส่ง","m-ok");
+  }
   updSyncStatus();
 }
-function delRemote(r){if(r&&r.synced===true&&cfgOK())postSync({action:"del",id:r.id}).catch(()=>smsg("ลบในเครื่องแล้ว แต่ลบในชีตไม่สำเร็จ ให้ลบในชีตเอง","m-warn"))}
+function delRemote(r){
+  if(!r)return;
+  const urls=Object.values(r.phU||{}).concat(r.trash||[]).filter(Boolean);
+  if((r.synced===true||r.rem===true||urls.length)&&cfgOK())postSync({action:"del",id:r.id,urls:urls}).catch(()=>smsg("ลบในเครื่องแล้ว แต่ลบในชีตไม่สำเร็จ ให้ลบในชีตเอง","m-warn"));
+}
 function loadCfgUI(){const c=syncCfg();$("sUrl").value=c.url;$("sCode").value=c.code;$("sBy").value=c.by}
 $("sCfgSave").onclick=async()=>{
   const u=$("sUrl").value.trim(),c=$("sCode").value.trim(),b=$("sBy").value.trim();
@@ -580,7 +780,7 @@ async function loadTeam(){
   const info=$("sSrcInfo");info.textContent="กำลังโหลดข้อมูลทีม...";
   try{
     const j=await postSync({action:"list"});
-    teamList=(j.rows||[]).map(r=>Object.assign({},r,{cause:r.cause||"",note:r.note||""}));
+    teamList=(j.rows||[]).map(r=>Object.assign({},r,{cause:r.cause||"",note:r.note||"",kind:r.kind||"defect"}));
     info.textContent="ข้อมูลทั้งทีม "+teamList.length+" รายการ · โหลดเมื่อ "+nowStr().slice(11,16);
   }catch(e){info.textContent="โหลดข้อมูลทีมไม่สำเร็จ: "+errMsg(e);teamList=[]}
   sumRender();
@@ -594,29 +794,31 @@ $("sSrc").onchange=()=>{
 $("sTeamReload").onclick=loadTeam;
 $("sTeamExp").onclick=async()=>{
   const v=$("sMon").value;
-  const L=teamList.filter(r=>v==="ALL"||monKey(r)===v);
+  const L=teamList.filter(r=>kindOf(r)===swKind&&(v==="ALL"||monKey(r)===v));
   if(!L.length){smsg("ไม่มีรายการให้ส่งออก","m-warn");return}
-  const num=x=>(x!==""&&x!=null&&!isNaN(Number(x)))?Number(x):x;
-  const aoa=[["ลำดับ","วันที่สับเปลี่ยน","เลขมิเตอร์เดิม","ขนาดเดิม","หน่วยเดิม","สาเหตุที่ชำรุด","เลขมิเตอร์ใหม่","ขนาดใหม่","หน่วยใหม่","ผู้บันทึก","บันทึกเมื่อ"]].concat(L.map((r,i)=>[i+1,fmtDate(r.date),r.old,r.oldSz||"",num(r.oldRd),causeText(r),r.nw,r.newSz||"",num(r.newRd),r.by||"",r.time||""]));
-  const res=await saveXlsx(aoa,[8,14,18,12,12,28,18,12,12,14,20],"swap-team-","ข้อมูลทีม");
+  const sp=exportSpec(L,true);
+  const res=await saveXlsx([sp.head].concat(sp.body),sp.w,swKind==="periodic"?"periodic-team-":"swap-team-","ข้อมูลทีม");
   const bad=res==="fail"||res==="declined";
   smsg(res==="declined"?"ยกเลิกการบันทึก":res==="fail"?"บันทึกไฟล์ไม่สำเร็จ":"ส่งออกข้อมูลทีมแล้ว ("+L.length+" รายการ)",bad?"m-warn":"m-ok");
 };
 $("sSumExp").onclick=async()=>{
-  if(!curSrc().length){smsg("ยังไม่มีข้อมูลให้สรุป","m-warn");return}
-  const keys=[...new Set(curSrc().map(r=>monKey(r)||"ไม่ระบุ"))].sort();
-  const cols=CAUSES.concat(["ไม่ระบุสาเหตุ"]);
-  const cnt=(L,c)=>L.filter(r=>c==="ไม่ระบุสาเหตุ"?!r.cause:r.cause===c).length;
+  const SRC=curSrc(),per=swKind==="periodic";
+  if(!SRC.length){smsg("ยังไม่มีข้อมูลให้สรุป","m-warn");return}
+  const keys=[...new Set(SRC.map(r=>monKey(r)||"ไม่ระบุ"))].sort();
+  const cols=per?[...new Set(SRC.map(r=>r.oldSz||"ไม่ระบุขนาด"))].sort():CAUSES.concat(["ไม่ระบุสาเหตุ"]);
+  const cnt=(L,c)=>per?L.filter(r=>(r.oldSz||"ไม่ระบุขนาด")===c).length:L.filter(r=>c==="ไม่ระบุสาเหตุ"?!r.cause:r.cause===c).length;
   const aoa=[["เดือน","รวม"].concat(cols)];
-  keys.forEach(k=>{const L=curSrc().filter(r=>(monKey(r)||"ไม่ระบุ")===k);aoa.push([k==="ไม่ระบุ"?k:monLabel(k),L.length].concat(cols.map(c=>cnt(L,c))))});
-  aoa.push(["รวมทั้งหมด",curSrc().length].concat(cols.map(c=>cnt(curSrc(),c))));
-  const res=await saveXlsx(aoa,[18,8].concat(cols.map(()=>16)),"swap-summary-","สรุปรายเดือน");
+  keys.forEach(k=>{const L=SRC.filter(r=>(monKey(r)||"ไม่ระบุ")===k);aoa.push([k==="ไม่ระบุ"?k:monLabel(k),L.length].concat(cols.map(c=>cnt(L,c))))});
+  aoa.push(["รวมทั้งหมด",SRC.length].concat(cols.map(c=>cnt(SRC,c))));
+  const res=await saveXlsx(aoa,[18,8].concat(cols.map(()=>16)),per?"periodic-summary-":"swap-summary-",per?"สรุปมิเตอร์ตามวาระ":"สรุปรายเดือน");
   const bad=res==="fail"||res==="declined";
   smsg(res==="declined"?"ยกเลิกการบันทึก":res==="fail"?"บันทึกไฟล์ไม่สำเร็จ":"ส่งออกสรุปแล้ว",bad?"m-warn":"m-ok");
 };
 $("sCopy").onclick=async()=>{
-  if(!swapList.length){smsg("ยังไม่มีรายการ","m-warn");return}
-  const t=["ลำดับ","วันที่สับเปลี่ยน","CA","เลขมิเตอร์เดิม","ขนาดเดิม","หน่วยเดิม","สาเหตุที่ชำรุด","เลขมิเตอร์ใหม่","ขนาดใหม่","หน่วยใหม่","วันเวลาที่บันทึก"].join("\t")+"\n"+swapList.map((r,i)=>[i+1,fmtDate(r.date),r.ca||"",r.old,r.oldSz||"",r.oldRd,causeText(r),r.nw,r.newSz||"",r.newRd,r.time].join("\t")).join("\n");
+  const L=swapList.filter(r=>kindOf(r)===swKind);
+  if(!L.length){smsg("ยังไม่มีรายการ","m-warn");return}
+  const sp=exportSpec(L,false);
+  const t=sp.head.join("\t")+"\n"+sp.body.map(r=>r.join("\t")).join("\n");
   if(await copyText(t))smsg("คัดลอกแล้ว วางใน Excel ได้เลย","m-ok");
   else{const x=$("sBox");x.value=t;x.classList.remove("hide");x.focus();x.select();smsg("คัดลอกอัตโนมัติไม่ได้ กดค้างที่กล่องข้อความด้านล่างเพื่อคัดลอกเอง","m-warn")}
 };
