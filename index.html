@@ -278,6 +278,8 @@ body.pdfmode::after{display:none!important}
 </div>
 </div>
 <div id="sec2" class="hide">
+<div class="mtabs" id="subTabs" style="margin-top:4px"><button data-sub="main" class="on"><span>📝</span>บันทึกงาน / รายการ</button><button data-sub="pdf"><span>📄</span>ส่งออกแบบฟอร์ม PDF</button></div>
+<div id="swMain">
 <div class="mtabs" id="kindTabs" style="margin-top:4px"><button data-k="defect" class="on"><span>🔴</span>มิเตอร์ชำรุด</button><button data-k="periodic"><span>📅</span>มิเตอร์ตามวาระ</button></div>
 <div class="card"><h2 id="sTitle">🔧 งานสับเปลี่ยน · มิเตอร์ชำรุด</h2>
 <div id="sEditBar" class="hide" style="margin:0 0 10px;padding:10px;border-radius:12px;border:2px solid var(--gold);background:var(--bg)"><div style="font-weight:700">✏️ กำลังแก้ไขรายการที่ <span id="sEditNo"></span></div><div style="font-size:13px;color:var(--mu)">แก้ไขแล้วกด “บันทึกการแก้ไข” ด้านล่าง</div><button id="sEditCancel" class="sec" style="margin-top:8px;width:100%">ยกเลิกการแก้ไข</button></div>
@@ -286,7 +288,7 @@ body.pdfmode::after{display:none!important}
 <input type="date" id="sDate" style="width:100%;box-sizing:border-box;padding:10px 12px;border-radius:12px;border:1px solid var(--bd);background:var(--card);color:var(--tx);font:inherit;color-scheme:light dark">
 </div>
 <div class="card"><h2 id="sOldTitle">🔴 มิเตอร์เดิม (ชำรุด)</h2>
-<label>CA / หมายเลขผู้ใช้ไฟ (ไม่กรอกก็ได้)</label>
+<label id="sCALbl">CA / หมายเลขผู้ใช้ไฟ *</label>
 <input type="text" id="sCA" inputmode="numeric" autocomplete="off">
 <label style="margin-top:8px">เลขมิเตอร์เดิม *</label>
 <input type="text" id="sOld" autocapitalize="characters" autocomplete="off">
@@ -339,13 +341,15 @@ body.pdfmode::after{display:none!important}
 <div class="row" style="margin-top:8px"><button id="sUndo" class="sec">ลบตัวล่าสุด</button><button id="sWipe" class="sec">ล้างทั้งหมด</button></div>
 <textarea id="sBox" class="hide" readonly rows="6" style="width:100%;margin-top:8px;box-sizing:border-box;border-radius:12px;padding:10px;font:14px monospace"></textarea>
 </div>
+</div>
+<div id="swPdf" class="hide">
 <div class="card"><h2>📄 ส่งออกแบบฟอร์ม PDF</h2>
-<div style="font-size:13px;color:var(--mu);margin-bottom:6px">1 รายการ = 1 ฉบับ · ออกทีละรายการได้ที่ปุ่ม 📄 ข้างรายการ</div>
+<div style="font-size:13px;color:var(--mu);margin-bottom:6px">1 รายการ = 1 ฉบับ · ออกทีละรายการได้ที่ปุ่ม 📄 ข้างรายการในแท็บ “บันทึกงาน / รายการ”</div>
 <label>แหล่งข้อมูล</label>
 <select id="pdfSrc" style="width:100%"><option value="local">📱 ข้อมูลเครื่องนี้</option><option value="team">🌐 ข้อมูลทั้งทีม (จากชีต · เครื่องอื่นบันทึกก็ออกได้)</option></select>
 <div id="pdfSrcInfo" style="font-size:13px;color:var(--mu);margin:6px 0"></div>
 <label>หมวดที่จะส่งออก</label>
-<select id="pdfScope" style="width:100%"><option value="kind">เฉพาะหมวดที่เลือกอยู่</option><option value="both">ทั้งสองหมวด (ชำรุด + ตามวาระ)</option></select>
+<select id="pdfScope" style="width:100%"><option value="both">ทั้งสองหมวด (ชำรุด + ตามวาระ)</option><option value="defect">เฉพาะมิเตอร์ชำรุด</option><option value="periodic">เฉพาะมิเตอร์ตามวาระ</option></select>
 <label style="margin-top:10px">รายวัน</label>
 <input type="date" id="pdfDay" style="width:100%;box-sizing:border-box;padding:10px 12px;border-radius:12px;border:1px solid var(--bd);background:var(--card);color:var(--tx);font:inherit;color-scheme:light dark">
 <div class="row" style="margin-top:8px"><button id="pdfDayBtn" class="sec">📄 ส่งออก PDF รายวัน</button></div>
@@ -353,6 +357,7 @@ body.pdfmode::after{display:none!important}
 <select id="pdfMon" style="width:100%"></select>
 <div class="row" style="margin-top:8px"><button id="pdfMonBtn" class="sec">📄 ส่งออก PDF รายเดือน</button></div>
 <div id="pdfMsg" style="display:none"></div>
+</div>
 </div>
 <details class="man" style="margin-bottom:12px"><summary>⚙️ เชื่อมข้อมูลทีม (Google Sheets)</summary>
 <div style="padding-bottom:12px">
@@ -633,6 +638,7 @@ function setKind(k){
   swKind=k;const per=k==="periodic";
   document.querySelectorAll("#kindTabs button").forEach(b=>b.classList.toggle("on",b.dataset.k===k));
   $("sTitle").textContent=per?"📅 งานสับเปลี่ยน · มิเตอร์ตามวาระ":"🔧 งานสับเปลี่ยน · มิเตอร์ชำรุด";
+  $("sCALbl").textContent=per?"CA / หมายเลขผู้ใช้ไฟ (ไม่กรอกก็ได้)":"CA / หมายเลขผู้ใช้ไฟ *";
   $("sOldTitle").textContent=per?"🔴 มิเตอร์เดิม (ครบวาระ)":"🔴 มิเตอร์เดิม (ชำรุด)";
   $("sHint").textContent=per?"กรอกข้อมูลและถ่ายรูปมิเตอร์คู่ (เก่า+ใหม่) ไว้ด้วย เพื่อกลับมาตรวจแก้ข้อมูลที่กรอกตกหล่นได้":"กรอกข้อมูลมิเตอร์เดิมและมิเตอร์ใหม่ พร้อมถ่ายรูปมิเตอร์คู่ แล้วกดบันทึก เมื่อครบส่งออก Excel ได้";
   $("sCauseBox").classList.toggle("hide",per);$("sPerBox").classList.toggle("hide",!per);
@@ -702,6 +708,7 @@ $("sSave").onclick=async()=>{
   const ca=$("sCA").value.trim(),old=cleanSw($("sOld").value),nw=cleanSw($("sNew").value);
   const oldRd=$("sOldRd").value.trim(),newRd=$("sNewRd").value.trim(),dt=$("sDate").value,cause=$("sCause").value,note=$("sCauseNote").value.trim();
   if(/^https?:/i.test(old)||/^https?:/i.test(nw)){smsg("นี่คือลิงก์ ไม่ใช่เลขมิเตอร์ ให้สแกนบาร์โค้ดแทน","m-bad");return}
+  if(!per&&!ca){smsg("มิเตอร์ชำรุดต้องกรอก CA ทุกครั้ง","m-bad");$("sCA").focus();return}
   if(!old){smsg("กรุณากรอกเลขมิเตอร์เดิม","m-bad");$("sOld").focus();return}
   if(!nw){smsg("กรุณากรอกเลขมิเตอร์ใหม่","m-bad");$("sNew").focus();return}
   if(old===nw){smsg("เลขมิเตอร์เดิมกับใหม่เหมือนกัน ตรวจอีกครั้ง","m-bad");return}
@@ -826,7 +833,7 @@ function closePdf(){$("pdfView").classList.add("hide");document.body.classList.r
 $("pvClose").onclick=closePdf;
 $("pvPrint").onclick=()=>{const old=document.title;document.title=pdfTitle;try{window.print()}catch(e){}setTimeout(()=>{document.title=old},2000)};
 function pmsg(t,c){const m=$("pdfMsg");m.textContent=({"m-ok":"✅ ","m-bad":"❌ ","m-warn":"⚠️ "}[c]||"")+t;m.style.cssText="display:block;margin-top:10px;padding:10px;border-radius:14px;text-align:center;font-weight:700;font-size:16px"}
-function pdfPool(){return ($("pdfSrc").value==="team"?teamList:swapList).filter(r=>$("pdfScope").value==="both"||kindOf(r)===swKind)}
+function pdfPool(){return ($("pdfSrc").value==="team"?teamList:swapList).filter(r=>{const s=$("pdfScope").value;return s==="both"||kindOf(r)===s})}
 async function pdfPrep(){
   if($("pdfSrc").value!=="team")return true;
   if(!cfgOK()){pmsg("ยังไม่ได้เชื่อมข้อมูลทีม ดูหัวข้อ ⚙️ ด้านล่างสุดของหน้านี้","m-warn");return false}
@@ -840,6 +847,13 @@ function pdfOpts(){
   if(keys.includes(cur))sel.value=cur;
 }
 $("pdfScope").onchange=pdfOpts;
+function setSub(k){
+  document.querySelectorAll("#subTabs button").forEach(b=>b.classList.toggle("on",b.dataset.sub===k));
+  $("swMain").classList.toggle("hide",k!=="main");$("swPdf").classList.toggle("hide",k!=="pdf");
+  if(k==="pdf")pdfOpts();
+  try{$("subTabs").scrollIntoView({block:"start"})}catch(e){}
+}
+document.querySelectorAll("#subTabs button").forEach(b=>b.onclick=()=>setSub(b.dataset.sub));
 $("pdfSrc").onchange=async()=>{
   $("pdfMsg").style.display="none";
   if($("pdfSrc").value==="team"){
