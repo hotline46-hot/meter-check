@@ -93,6 +93,55 @@ input[type=text]{box-sizing:border-box;width:100%;min-width:0}
 #pv{display:none;position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.9);align-items:center;justify-content:center;padding:12px}
 #pv.on{display:flex}#pv img{max-width:100%;max-height:100%;object-fit:contain}
 .it.editing{background:rgba(242,183,5,.18);border-radius:10px;padding-left:6px}
+.fpage{font-family:"Sarabun","TH Sarabun New","Noto Sans Thai","Thonburi","Tahoma","Loma",sans-serif;font-size:9.6pt;color:#000;background:#fff;width:210mm;height:297mm;padding:9mm 19mm 0 19mm;position:relative;overflow:hidden;break-after:page}
+.fpage:last-child{break-after:auto}
+.fpage,.fpage *{box-sizing:border-box}
+.flogo{display:block;margin:0 auto;width:27mm;height:27mm}
+.fh1{font-size:14.5pt;text-align:center;margin:2.5mm 0 4.5mm;font-weight:700}
+.fl{display:flex;align-items:baseline;white-space:nowrap;height:8.1mm;gap:1.6mm}
+.fl>span{flex:none}
+.fl>.ff{flex:1 1 0}.fl>.ff.fs{flex:none}
+.ff{min-width:0;border-bottom:1.3px dotted #000;text-align:center;overflow:hidden;line-height:1.25;height:1.45em;padding:0 .5mm;position:relative;top:.2mm}
+.find{padding-left:19.5mm}
+.fcb{display:inline-block;width:11mm;height:1.3em;text-align:center;position:relative;flex:none}
+.fcb::before{content:"(";position:absolute;left:0;top:0}
+.fcb::after{content:")";position:absolute;right:0;top:0}
+.fcb i{display:none}
+.fcb.fon i{display:block;position:absolute;left:4.2mm;top:.1mm;width:1.7mm;height:3.4mm;border-right:.5mm solid #000;border-bottom:.5mm solid #000;transform:rotate(40deg)}
+.frow{position:relative;height:8.1mm;white-space:nowrap}
+.frow>*{position:absolute;top:0}
+.fu{text-decoration:underline;text-underline-offset:1.2mm}
+.fjust{display:block;text-align:justify;text-align-last:justify;white-space:nowrap;height:8.1mm}
+.flft{display:block;white-space:nowrap;height:8.1mm}
+.fsig{display:flex;justify-content:space-between}
+.fsig>div{width:48%}
+.fc{text-align:center}
+.f3{display:flex;justify-content:space-between}
+.f3>div{width:31.5%}
+.fpn{display:inline-block;min-width:46mm;border-bottom:1.3px dotted #000;text-align:center;line-height:1.2;height:1.35em;vertical-align:baseline;position:relative;top:.2mm}
+.fpage b{font-weight:700}
+
+@page{size:A4;margin:0}
+#pdfView{position:fixed;inset:0;z-index:60;background:#5a5a5a;overflow:auto;-webkit-overflow-scrolling:touch}
+#pdfView.hide{display:none}
+#pdfView .pvbar{position:sticky;top:0;z-index:2;display:flex;gap:8px;align-items:center;padding:10px 12px;padding-top:calc(10px + env(safe-area-inset-top,0px));background:#2b1646;color:#fff}
+#pdfView .pvbar b{flex:1;min-width:0;font-size:15px}
+#pdfView .pvbar button{min-height:42px;padding:6px 14px;border-radius:12px;border:0;font:inherit;font-weight:700;background:#f2b705;color:#2b1646}
+#pdfView .pvbar button.x{background:transparent;color:#fff;border:1px solid #fff}
+#pdfView .pvhint{color:#ddd;font-size:13px;text-align:center;padding:8px 12px}
+#pdfView .pvbox{margin:6px auto 30px;overflow:hidden}
+#pdfView .pvwrap{width:210mm;transform-origin:0 0;transform:scale(var(--z,1))}
+#pdfView .fpage{margin:0 auto 14px;box-shadow:0 2px 12px rgba(0,0,0,.5)}
+@media print{
+body.pdfmode>*:not(#pdfView){display:none!important}
+body.pdfmode{margin:0!important;padding:0!important;background:#fff!important;min-height:0!important;height:auto!important}
+body.pdfmode::after{display:none!important}
+#pdfView{position:static!important;overflow:visible!important;background:#fff!important;display:block!important}
+#pdfView .pvbar,#pdfView .pvhint{display:none!important}
+#pdfView .pvbox{width:auto!important;height:auto!important;margin:0!important;overflow:visible!important}
+#pdfView .pvwrap{transform:none!important;width:auto!important;padding:0!important;margin:0!important}
+#pdfView .fpage{margin:0!important;box-shadow:none!important;height:296.5mm!important}
+}
 </style>
 </head>
 <body>
@@ -259,6 +308,16 @@ input[type=text]{box-sizing:border-box;width:100%;min-width:0}
 <div class="row" style="margin-top:8px"><label class="phbtn">📷 ถ่ายรูป<input type="file" accept="image/*" capture="environment" id="phPairIn" hidden></label><label class="phbtn sec">🖼️ เลือกจากแกลเลอรี<input type="file" accept="image/*" id="phPairGal" hidden></label></div>
 <div id="phPairPv" class="hide" style="margin-top:8px"><img id="phPairImg" class="phimg" alt=""><button id="phPairDel" class="sec" style="width:100%">🗑️ ลบรูปนี้</button></div>
 </div>
+<div class="card"><h2>👤 ข้อมูลผู้ใช้ไฟ <span style="font-size:13px;font-weight:400;color:var(--mu)">(ส่งขึ้นชีตด้วย เพื่อให้ทีมออกแบบฟอร์ม PDF ได้)</span></h2>
+<label>ชื่อ-สกุล ผู้ใช้ไฟ (ไม่กรอกก็ได้)</label>
+<input type="text" id="sName" autocomplete="off" placeholder="เช่น นายสมชาย ใจดี">
+<div class="row" style="margin-top:8px"><div><label>บ้านเลขที่</label><input type="text" id="sHouse" autocomplete="off"></div><div><label>หมู่</label><input type="text" id="sMoo" inputmode="numeric" autocomplete="off"></div></div>
+<label style="margin-top:8px">ตำบล</label>
+<input type="text" id="sTambon" autocomplete="off">
+<label style="margin-top:8px">ค่าใช้จ่ายในการเปลี่ยนมิเตอร์</label>
+<select id="sFee" style="width:100%"><option value="">(ไม่ระบุ)</option><option value="free">ไม่ต้องเสียค่าใช้จ่ายใดๆ</option><option value="pay">ต้องเสียค่าใช้จ่าย</option></select>
+<input type="text" id="sFeeAmt" class="hide" inputmode="decimal" placeholder="จำนวนเงิน (บาท)" autocomplete="off" style="margin-top:8px">
+</div>
 <div class="card">
 <div class="row"><button id="sSave" class="big">💾 บันทึกรายการ</button></div>
 <div class="row" style="margin-top:8px"><button id="sClr" class="sec">ล้างฟอร์ม</button></div>
@@ -280,6 +339,21 @@ input[type=text]{box-sizing:border-box;width:100%;min-width:0}
 <div class="row" style="margin-top:8px"><button id="sUndo" class="sec">ลบตัวล่าสุด</button><button id="sWipe" class="sec">ล้างทั้งหมด</button></div>
 <textarea id="sBox" class="hide" readonly rows="6" style="width:100%;margin-top:8px;box-sizing:border-box;border-radius:12px;padding:10px;font:14px monospace"></textarea>
 </div>
+<div class="card"><h2>📄 ส่งออกแบบฟอร์ม PDF</h2>
+<div style="font-size:13px;color:var(--mu);margin-bottom:6px">1 รายการ = 1 ฉบับ · ออกทีละรายการได้ที่ปุ่ม 📄 ข้างรายการ</div>
+<label>แหล่งข้อมูล</label>
+<select id="pdfSrc" style="width:100%"><option value="local">📱 ข้อมูลเครื่องนี้</option><option value="team">🌐 ข้อมูลทั้งทีม (จากชีต · เครื่องอื่นบันทึกก็ออกได้)</option></select>
+<div id="pdfSrcInfo" style="font-size:13px;color:var(--mu);margin:6px 0"></div>
+<label>หมวดที่จะส่งออก</label>
+<select id="pdfScope" style="width:100%"><option value="kind">เฉพาะหมวดที่เลือกอยู่</option><option value="both">ทั้งสองหมวด (ชำรุด + ตามวาระ)</option></select>
+<label style="margin-top:10px">รายวัน</label>
+<input type="date" id="pdfDay" style="width:100%;box-sizing:border-box;padding:10px 12px;border-radius:12px;border:1px solid var(--bd);background:var(--card);color:var(--tx);font:inherit;color-scheme:light dark">
+<div class="row" style="margin-top:8px"><button id="pdfDayBtn" class="sec">📄 ส่งออก PDF รายวัน</button></div>
+<label style="margin-top:10px">รายเดือน</label>
+<select id="pdfMon" style="width:100%"></select>
+<div class="row" style="margin-top:8px"><button id="pdfMonBtn" class="sec">📄 ส่งออก PDF รายเดือน</button></div>
+<div id="pdfMsg" style="display:none"></div>
+</div>
 <details class="man" style="margin-bottom:12px"><summary>⚙️ เชื่อมข้อมูลทีม (Google Sheets)</summary>
 <div style="padding-bottom:12px">
 <div id="sSync2" style="font-size:13px;color:var(--mu);margin-bottom:8px"></div>
@@ -291,11 +365,12 @@ input[type=text]{box-sizing:border-box;width:100%;min-width:0}
 <input type="text" id="sBy" autocomplete="off">
 <div class="row" style="margin-top:10px"><button id="sCfgSave">💾 บันทึกการตั้งค่า</button></div>
 <div class="row" style="margin-top:8px"><button id="sSyncNow" class="sec">🔄 ส่งข้อมูลที่ค้าง</button><button id="sSyncOld" class="sec">⬆️ ส่งรายการเก่าทั้งหมดขึ้นชีต</button></div>
-<div style="font-size:13px;color:var(--mu);margin-top:10px">ส่งขึ้นชีตเฉพาะ: วันที่ เลขมิเตอร์เดิม/ใหม่ ขนาด หน่วย สาเหตุ และชื่อผู้บันทึก <b>ไม่ส่ง CA</b> (CA ยังอยู่ในเครื่องและในไฟล์ Excel ที่ส่งออกจากเครื่องนี้) · รูปมิเตอร์คู่ (ทั้งสองหมวด) จะอัปโหลดเข้าโฟลเดอร์ใน Google Drive ของเจ้าของสคริปต์</div>
+<div style="font-size:13px;color:var(--mu);margin-top:10px">ส่งขึ้นชีต: วันที่ เลขมิเตอร์เดิม/ใหม่ ขนาด หน่วย สาเหตุ ผู้บันทึก <b>และข้อมูลผู้ใช้ไฟ (CA ชื่อ-สกุล ที่อยู่ ค่าใช้จ่าย)</b> สำหรับออกแบบฟอร์ม PDF จากเครื่องไหนก็ได้ · <b>ควรแชร์ชีตให้เฉพาะคนในทีม</b> · รูปมิเตอร์คู่จะอัปโหลดเข้าโฟลเดอร์ใน Google Drive ของเจ้าของสคริปต์</div>
 </div></details>
 </div>
 </main>
 
+<div id="pdfView" class="hide"><div class="pvbar"><b id="pvCount"></b><button id="pvPrint">🖨️ บันทึกเป็น PDF</button><button id="pvClose" class="x">✖ ปิด</button></div><div class="pvhint">กด “บันทึกเป็น PDF” แล้วเลือกปลายทางเป็น <b>บันทึกเป็น PDF</b> (Android) หรือกดปุ่มแชร์ในหน้าพิมพ์ (iPhone)</div><div class="pvbox" id="pvBox"><div class="pvwrap" id="pvPages"></div></div></div>
 <div id="pv"><img alt=""></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
@@ -542,13 +617,13 @@ function swapRender(){
     if(per)d3="📷 รูปคู่ "+hp+(r.note?"<br>📝 "+esc(r.note):"");
     else d3="🛠️ "+esc(causeText(r))+"<br>📷 รูปคู่ "+hp;
     const th=(r.ph&&r.ph.pair)?'<img class="thm" alt="" data-k="'+esc(r.id)+':pair">':"";
-    return '<div class="it'+(r.id===editId?" editing":"")+'" data-i="'+i+'" style="display:flex;gap:8px;align-items:center"><div style="flex:1;min-width:0;cursor:pointer">'+(x.n+1)+". "+esc(r.old)+" → "+esc(r.nw)+(r.synced?" ☁️":(cfgOK()?" 🟠":""))+(th?'<div style="margin-top:4px">'+th+"</div>":"")+"<small>"+d1+"<br>"+d2+"<br>"+d3+"</small></div>"+'<button class="sec sdel" data-i="'+i+'" style="min-height:36px;padding:4px 10px;flex:0 0 auto">🗑️</button></div>';
+    return '<div class="it'+(r.id===editId?" editing":"")+'" data-i="'+i+'" style="display:flex;gap:8px;align-items:center"><div style="flex:1;min-width:0;cursor:pointer">'+(x.n+1)+". "+esc(r.old)+" → "+esc(r.nw)+(r.synced?" ☁️":(cfgOK()?" 🟠":""))+(th?'<div style="margin-top:4px">'+th+"</div>":"")+"<small>"+d1+"<br>"+d2+"<br>"+d3+"</small></div>"+'<div style="display:flex;flex-direction:column;gap:6px;flex:0 0 auto"><button class="sec spdf" data-i="'+i+'" style="min-height:36px;padding:4px 10px" aria-label="ส่งออก PDF">📄</button><button class="sec sdel" data-i="'+i+'" style="min-height:36px;padding:4px 10px" aria-label="ลบ">🗑️</button></div></div>';
   }).join(""):'<div class="it" style="color:var(--mu)">ยังไม่มีรายการ กรอกข้อมูลด้านบนแล้วกดบันทึก</div>';
-  fillThumbs();
+  fillThumbs();pdfOpts();
 }
 function resetForm(){
-  ["sCA","sOld","sOldRd","sNew","sNewRd","sOldSz","sNewSz","sCause","sCauseNote","sPerNote"].forEach(id=>{$(id).value=""});
-  $("sCauseNote").classList.add("hide");
+  ["sCA","sOld","sOldRd","sNew","sNewRd","sOldSz","sNewSz","sCause","sCauseNote","sPerNote","sName","sHouse","sMoo","sTambon","sFee","sFeeAmt"].forEach(id=>{$(id).value=""});
+  $("sCauseNote").classList.add("hide");$("sFeeAmt").classList.add("hide");
   phCur={pair:null};phChg={pair:false};showPh("pair");
   editId=null;$("sEditBar").classList.add("hide");$("sSave").textContent="💾 บันทึกรายการ";
   document.querySelectorAll("#sList .editing").forEach(e=>e.classList.remove("editing"));
@@ -573,6 +648,7 @@ async function startEdit(i){
   $("sDate").value=r.date||todayISO();
   $("sCA").value=r.ca||"";$("sOld").value=r.old||"";$("sOldRd").value=r.oldRd||"";$("sNew").value=r.nw||"";$("sNewRd").value=r.newRd||"";
   ensureOpt("sOldSz",r.oldSz);ensureOpt("sNewSz",r.newSz);
+  $("sName").value=r.name||"";$("sHouse").value=r.house||"";$("sMoo").value=r.moo||"";$("sTambon").value=r.tambon||"";$("sFee").value=r.fee||"";$("sFeeAmt").value=r.feeAmt||"";$("sFeeAmt").classList.toggle("hide",r.fee!=="pay");
   for(const s of SLOTS)if(r.ph&&r.ph[s]){try{phCur[s]=await idbGet(r.id+":"+s)}catch(e){}}
   showPh("pair");
   if(kindOf(r)==="periodic"){
@@ -638,7 +714,7 @@ $("sSave").onclick=async()=>{
   if(others.some(r=>r.nw===nw)){smsg("มิเตอร์ใหม่เลขนี้ถูกใช้ในรายการอื่นแล้ว","m-warn");return}
   if(PHOTO_REQUIRED&&!phCur.pair){smsg("กรุณาถ่ายรูปมิเตอร์คู่ (เก่า+ใหม่) ก่อนบันทึก","m-bad");return}
   const rec=ed||{id:newId(),time:nowStr()};
-  Object.assign(rec,{kind:swKind,synced:false,rev:(rec.rev||0)+1,date:dt,cause:per?"":cause,note:per?$("sPerNote").value.trim():(cause==="อื่น ๆ"?note:""),ca,old,oldSz:$("sOldSz").value,oldRd,nw,newSz:$("sNewSz").value,newRd});
+  Object.assign(rec,{kind:swKind,synced:false,rev:(rec.rev||0)+1,date:dt,cause:per?"":cause,note:per?$("sPerNote").value.trim():(cause==="อื่น ๆ"?note:""),ca,old,oldSz:$("sOldSz").value,oldRd,nw,newSz:$("sNewSz").value,newRd,name:$("sName").value.trim(),house:$("sHouse").value.trim(),moo:$("sMoo").value.trim(),tambon:$("sTambon").value.trim(),fee:$("sFee").value,feeAmt:$("sFee").value==="pay"?$("sFeeAmt").value.trim():""});
   rec.ph=rec.ph||{};rec.phU=rec.phU||{};rec.phD=rec.phD||{};rec.phV=rec.phV||{};rec.trash=rec.trash||[];
   let phErr=false;
   for(const s of SLOTS){
@@ -662,6 +738,8 @@ $("sSave").onclick=async()=>{
 };
 $("sClr").onclick=()=>{resetForm();$("sMsg").style.display="none"};
 $("sList").onclick=e=>{
+  const pb=e.target.closest(".spdf");
+  if(pb){const r=swapList[+pb.dataset.i];if(r)openPdf([r],"แบบฟอร์ม"+(kindOf(r)==="periodic"?"มิเตอร์ตามวาระ":"มิเตอร์ชำรุด")+"_"+r.old);return}
   const b=e.target.closest(".sdel");
   if(b){
     const r=swapList[+b.dataset.i];if(!r)return;
@@ -690,6 +768,101 @@ $("sExp").onclick=async()=>{
   const bad=res==="fail"||res==="declined";
   smsg(res==="declined"?"ยกเลิกการบันทึก":res==="fail"?"บันทึกไฟล์ไม่สำเร็จ ลองปุ่มคัดลอกรายการ":"ส่งออกแล้ว ("+L.length+" รายการ)",bad?"m-warn":"m-ok");
 };
+
+/* ===== ส่งออกแบบฟอร์ม PDF (1 รายการ = 1 ฉบับ) ===== */
+const PDF_LOGO="app"; // "app" = โลโก้ในแอป · "form" = โลโก้สีแดงตามแบบฟอร์มต้นฉบับ
+const LOGO_FORM="data:image/png;base64,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";
+const PDF_TPL=`<div class="fpage"><img class="flogo" src="{{logo}}" alt=""><div class="fh1">การไฟฟ้าส่วนภูมิภาค สาขาอำเภอคำชะอี</div><div class="fl find"><span>ตามที่เจ้าหน้าที่ การไฟฟ้าฯได้ตรวจสอบมิเตอร์เมื่อวันที่</span><span class="ff fs" style="width:10mm">{{d_day}}</span><span>เดือน</span><span class="ff fs" style="width:23mm">{{d_mon}}</span><span>พ.ศ.</span><span class="ff fs" style="width:15mm">{{d_year}}</span></div><div class="fl"><span>และตรวจสอบพบมิเตอร์หมายเลขผู้ใช้ไฟ</span><span class="ff" style="flex:1.1">{{ca}}</span><span>ชื่อ</span><span class="ff" style="flex:1.1">{{fname}}</span><span>สกุล</span><span class="ff">{{lname}}</span></div><div class="fl"><span>บ้านเลขที่</span><span class="ff fs" style="width:18mm">{{house}}</span><span>หมู่</span><span class="ff fs" style="width:15mm">{{moo}}</span><span>ตำบล</span><span class="ff">{{tambon}}</span><span>อำเภอ</span><span class="ff fs" style="width:24mm">คำชะอี</span><span>จังหวัด</span><span class="ff fs" style="width:26mm">มุกดาหาร</span></div><div class="fl"><span>PEA</span><span class="ff" style="flex:1.5">{{pea_old}}</span><span>หมายเลขเครื่อง</span><span class="ff">{{serial}}</span><span>ขนาด</span><span class="ff fs" style="width:17mm">{{size}}</span><span>แอมป์</span><span class="ff fs" style="width:12mm">{{phase}}</span><span>เฟส</span><span class="ff fs" style="width:12mm">{{wire}}</span><span>สาย</span></div><div class="fl"><span class="ff fs" style="width:16mm">220</span><span>โวลท์</span><span>ผู้ผลิต</span><span class="ff">{{maker}}</span><span>ตัวเลขที่อ่านได้</span><span class="ff" style="flex:.9">{{reading_old}}</span><span>ลักษณะการชำรุด ดังนี้</span></div><div style="height:1.2mm"></div><div class="frow"><span class="fcb {{c1}}" style="left:20mm"><i></i></span><span style="left:31.5mm">ขดลวดทองแดงไหม้ เนื่องจากใช้ไฟเกินพิกัด</span><b style="left:112mm">PEA(ใหม่)</b><span class="ff" style="left:133mm;width:37mm;top:.2mm">{{pea_new}}</span></div><div class="frow"><span class="fcb {{c2}}" style="left:20mm"><i></i></span><span style="left:31.5mm">ฝาครอบแตก</span><span class="fcb {{c3}}" style="left:95mm"><i></i></span><span style="left:106.5mm">ไม่หมุน</span><b style="left:128mm">หน่วย</b><span class="ff" style="left:141mm;width:29mm;top:.2mm">{{reading_new}}</span></div><div class="frow"><span class="fcb {{c4}}" style="left:20mm"><i></i></span><span style="left:31.5mm">หมุนถอยหลัง</span><span class="fcb {{c5}}" style="left:95mm"><i></i></span><span style="left:106.5mm">หมุนติดขัด</span><b style="left:128mm">ขนาด</b><span class="ff" style="left:141mm;width:29mm;top:.2mm">{{size_new}}</span></div><div class="frow"><span class="fcb {{c6}}" style="left:20mm"><i></i></span><span style="left:31.5mm">ตราตะกั่วของมิเตอร์ชำรุด</span><span class="fcb {{c7}}" style="left:95mm"><i></i></span><span style="left:106.5mm">ช็อตไหม้</span></div><div class="frow"><span class="fcb {{c8}}" style="left:20mm"><i></i></span><span style="left:31.5mm">ตามวาระ</span><span class="fcb {{c9}}" style="left:95mm"><i></i></span><span style="left:106.5mm">อื่นๆ</span><span class="ff" style="left:117mm;width:53mm;top:.2mm">{{other}}</span></div><div class="flft fu" style="margin-top:.4mm">ในการเปลี่ยนมิเตอร์เครื่องใหม่แทนมิเตอร์ผู้ใช้ไฟ</div><div class="fl find"><span class="fcb {{p1}}"><i></i></span><span>ต้องเสียค่าใช้จ่าย จำนวน</span><span class="ff">{{fee}}</span><span>บาท</span><span class="fcb {{p2}}" style="margin-left:3mm"><i></i></span><span>ไม่ต้องเสียค่าใช้จ่ายใดๆ</span></div><div class="fl"><span>ข้าพเจ้า นาย,นาง,นางสาว</span><span class="ff">{{full}}</span><span>ผู้ใช้ไฟหรือตัวแทนของผู้ใช้มิเตอร์</span></div><div class="fjust">หมายเลขดังกล่าวข้างต้น ได้เข้าร่วมในการตรวจสอบครั้งนี้ด้วย&nbsp; จึงได้ทราบรายละเอียดต่างๆ ของลักษณะการชำรุดของ</div><div class="fjust">มิเตอร์จนเป็นที่เข้าใจแล้ว และจะปฏิบัติตามระเบียบของการไฟฟ้าส่วนภูมิภาคต่อไป จึงได้ลงลายมือชื่อ ไว้เป็นหลักฐาน</div><div class="fjust">สำคัญ&nbsp; และพนักงานการไฟฟ้าไม่ได้บังคับหรือขู่เข็ญแต่ประการใด&nbsp; พร้อมนี้ได้รับสำเนาการตรวจสอบไว้แล้ว&nbsp; และจะไป</div><div class="flft">ติดต่อที่สำนักงานการไฟฟ้าส่วนภูมิภาค&nbsp; สาขาอำเภอคำชะอี</div><div class="fl find"><span>ในวันที่</span><span class="ff fs" style="width:17mm">{{s_day}}</span><span>เดือน</span><span class="ff fs" style="width:40mm">{{s_mon}}</span><span>พ.ศ.</span><span class="ff fs" style="width:42mm">{{s_year}}</span></div><div class="fsig" style="margin-top:.6mm"><div class="fl find" style="padding-left:19.5mm"><span>(ลงชื่อ)</span><span class="ff"></span><span>ผู้ใช้ไฟ</span></div><div class="fl"><span>(ลงชื่อ)</span><span class="ff"></span><span>ผู้ตรวจสอบ</span></div></div><div class="fsig" style="margin-top:-.8mm"><div class="fc flft" style="padding-left:19.5mm">(<span class="fpn">{{full}}</span>)</div><div class="fc flft">(<span class="fpn">{{inspector}}</span>)</div></div><div class="fsig"><div class="fl" style="padding-left:19.5mm"><span>(ลงชื่อ)</span><span class="ff"></span><span>พยาน</span></div><div class="fl"><span>(ลงชื่อ)</span><span class="ff"></span><span>พยาน</span></div></div><div class="fsig" style="margin-top:-.8mm"><div class="fc flft" style="padding-left:19.5mm">(<span class="fpn"></span>)</div><div class="fc flft">(<span class="fpn"></span>)</div></div><div class="fsig" style="margin-top:1.2mm"><div class="flft"><span style="margin-right:6mm">เรียน</span>ผจก.กฟส.คช.</div><div class="flft" style="width:48%">เรียน&nbsp; ผจก.กฟส.คช.</div></div><div class="fsig"><div class="flft" style="padding-left:14mm">หผ.บต.,หผ.บง.ดำเนินการต่อไป</div><div class="fl" style="padding-left:11mm"><span>รับชำระเงินเลขที่</span><span class="ff"></span></div></div><div class="fsig"><div></div><div class="fl" style="padding-left:11mm"><span>ลงวันที่</span><span class="ff"></span></div></div><div class="f3" style="margin-top:1mm"><div class="fl"><span>(ลงชื่อ)</span><span class="ff"></span></div><div class="fl"><span>(ลงชื่อ)</span><span class="ff"></span></div><div class="fl"><span>(ลงชื่อ)</span><span class="ff"></span></div></div><div class="f3" style="margin-top:-1mm"><div class="fc flft">หผ.บต.กฟส.คช.</div><div class="fc flft">ผจก.กฟส.คช.</div><div class="fc flft">หผ.บง.กฟส.คช.</div></div><div class="f3" style="margin-top:-1mm"><div class="fl" style="padding:0 4mm"><span class="ff"></span><span>/</span><span class="ff"></span><span>/</span><span class="ff"></span></div><div class="fl" style="padding:0 4mm"><span class="ff"></span><span>/</span><span class="ff"></span><span>/</span><span class="ff"></span></div><div class="fl" style="padding:0 4mm"><span class="ff"></span><span>/</span><span class="ff"></span><span>/</span><span class="ff"></span></div></div></div>`;
+const PDF_CAUSE={"ช็อตไหม้":"c7","หมุนติดขัด":"c5","ไม่หมุน":"c3","หมุนถอยหลัง":"c4","ตราตะกั่วของมิเตอร์ชำรุด":"c6","ฝาครอบมิเตอร์แตก":"c2","ขดลวดทองแดงไหม้ เนื่องจากใช้ไฟเกินพิกัด":"c1","อื่น ๆ":"c9"};
+let pdfTitle="แบบฟอร์มมิเตอร์";
+function pdfData(r){
+  const per=kindOf(r)==="periodic";
+  const m=String(r.date||"").match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  const day=m?String(+m[3]):"",mon=m?TH_M[+m[2]-1]:"",yr=m?String(+m[1]+543):"";
+  const parts=String(r.name||"").trim().split(/\s+/).filter(Boolean),fn=parts.shift()||"",ln=parts.join(" ");
+  const d={d_day:day,d_mon:mon,d_year:yr,s_day:day,s_mon:mon,s_year:yr,ca:r.ca||"",fname:fn,lname:ln,house:r.house||"",moo:r.moo||"",tambon:r.tambon||"",
+    pea_old:r.old||"",serial:"",size:r.oldSz||"",phase:"",wire:"",maker:"",reading_old:r.oldRd||"",
+    pea_new:r.nw||"",reading_new:r.newRd||"",size_new:r.newSz||"",other:"",
+    fee:r.fee==="pay"?(r.feeAmt||""):"",p1:r.fee==="pay"?"fon":"",p2:r.fee==="free"?"fon":"",
+    full:String(r.name||"").trim(),inspector:"",
+    logo:(PDF_LOGO==="form")?LOGO_FORM:((document.querySelector("img.logo")||{}).src||"")};
+  for(let i=1;i<=9;i++)d["c"+i]="";
+  if(per)d.c8="fon";
+  else if(PDF_CAUSE[r.cause]){d[PDF_CAUSE[r.cause]]="fon";if(r.cause==="อื่น ๆ")d.other=r.note||""}
+  return d;
+}
+function pdfPageHtml(r){const d=pdfData(r);return PDF_TPL.replace(/\{\{(\w+)\}\}/g,(x,k)=>d[k]==null?"":(k==="logo"?d[k]:esc(String(d[k]))))}
+function fitForms(root){
+  root.querySelectorAll(".ff").forEach(e=>{let fs=parseFloat(getComputedStyle(e).fontSize),n=0;while(e.scrollWidth>e.clientWidth+.5&&fs>6&&n++<60){fs-=.3;e.style.fontSize=fs+"px"}});
+  root.querySelectorAll(".fpage").forEach(pg=>{
+    const pr=pg.getBoundingClientRect(),k=pr.width/(pg.offsetWidth||1),lim=pr.right-parseFloat(getComputedStyle(pg).paddingRight)*k+1;
+    pg.querySelectorAll(".fl,.fjust,.flft,.frow").forEach(e=>{
+      let fs=parseFloat(getComputedStyle(e).fontSize),n=0;
+      const bad=()=>{
+        const rg=document.createRange();rg.selectNodeContents(e);let mx=rg.getBoundingClientRect().right;
+        e.querySelectorAll("*").forEach(c=>{mx=Math.max(mx,c.getBoundingClientRect().right)});
+        if(mx>lim)return true;
+        return [...e.querySelectorAll(".ff:not(.fs)")].some(f=>f.clientWidth<30);
+      };
+      while(bad()&&n++<20){fs*=.97;e.style.fontSize=fs+"px"}
+    });
+  });
+}
+function openPdf(recs,title){
+  if(!recs||!recs.length)return;
+  recs=recs.slice().sort((a,b)=>String(a.date||"").localeCompare(String(b.date||""))||String(a.time||"").localeCompare(String(b.time||"")));
+  pdfTitle=title||"แบบฟอร์มมิเตอร์";
+  const wrap=$("pvPages");
+  wrap.style.setProperty("--z","1");$("pvBox").style.width="";$("pvBox").style.height="";
+  wrap.innerHTML=recs.map(pdfPageHtml).join("");
+  $("pvCount").textContent="ตัวอย่างแบบฟอร์ม · "+recs.length+" ฉบับ";
+  const v=$("pdfView");v.classList.remove("hide");document.body.classList.add("pdfmode");v.scrollTop=0;
+  const go=()=>{fitForms(wrap);const z=Math.min(1,(window.innerWidth-12)/(210/25.4*96));wrap.style.setProperty("--z",String(z));const bx=$("pvBox");bx.style.width=(210/25.4*96*z)+"px";bx.style.height=(wrap.offsetHeight*z)+"px"};
+  (document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(()=>requestAnimationFrame(go));
+}
+function closePdf(){$("pdfView").classList.add("hide");document.body.classList.remove("pdfmode");$("pvPages").innerHTML=""}
+$("pvClose").onclick=closePdf;
+$("pvPrint").onclick=()=>{const old=document.title;document.title=pdfTitle;try{window.print()}catch(e){}setTimeout(()=>{document.title=old},2000)};
+function pmsg(t,c){const m=$("pdfMsg");m.textContent=({"m-ok":"✅ ","m-bad":"❌ ","m-warn":"⚠️ "}[c]||"")+t;m.style.cssText="display:block;margin-top:10px;padding:10px;border-radius:14px;text-align:center;font-weight:700;font-size:16px"}
+function pdfPool(){return ($("pdfSrc").value==="team"?teamList:swapList).filter(r=>$("pdfScope").value==="both"||kindOf(r)===swKind)}
+async function pdfPrep(){
+  if($("pdfSrc").value!=="team")return true;
+  if(!cfgOK()){pmsg("ยังไม่ได้เชื่อมข้อมูลทีม ดูหัวข้อ ⚙️ ด้านล่างสุดของหน้านี้","m-warn");return false}
+  const ok=await loadTeam();if(!ok)pmsg("โหลดข้อมูลทีมไม่สำเร็จ","m-warn");return ok;
+}
+function pdfOpts(){
+  const sel=$("pdfMon");if(!sel)return;
+  const cnt={};pdfPool().forEach(r=>{const k=monKey(r);if(k)cnt[k]=(cnt[k]||0)+1});
+  const keys=Object.keys(cnt).sort().reverse(),cur=sel.value;
+  sel.innerHTML=keys.length?keys.map(k=>'<option value="'+k+'">'+monLabel(k)+" ("+cnt[k]+" ฉบับ)</option>").join(""):'<option value="">(ยังไม่มีข้อมูล)</option>';
+  if(keys.includes(cur))sel.value=cur;
+}
+$("pdfScope").onchange=pdfOpts;
+$("pdfSrc").onchange=async()=>{
+  $("pdfMsg").style.display="none";
+  if($("pdfSrc").value==="team"){
+    if(!cfgOK()){$("pdfSrcInfo").textContent="ยังไม่ได้เชื่อมข้อมูลทีม ดูหัวข้อ ⚙️ ด้านล่างสุดของหน้านี้";pdfOpts();return}
+    if(!teamLoaded)await loadTeam();else $("pdfSrcInfo").textContent="ข้อมูลทั้งทีม "+teamList.length+" รายการ (จะโหลดข้อมูลล่าสุดอีกครั้งตอนกดส่งออก)";
+  }else $("pdfSrcInfo").textContent="";
+  pdfOpts();
+};
+$("pdfDay").value=todayISO();
+$("pdfDayBtn").onclick=async()=>{
+  const d=$("pdfDay").value;if(!d){pmsg("เลือกวันที่ก่อน","m-warn");return}
+  if(!await pdfPrep())return;
+  const L=pdfPool().filter(r=>r.date===d);
+  if(!L.length){pmsg("ไม่มีรายการของวันที่ "+fmtDate(d),"m-warn");return}
+  $("pdfMsg").style.display="none";openPdf(L,"แบบฟอร์มมิเตอร์_"+d+"_"+L.length+"ฉบับ");
+};
+$("pdfMonBtn").onclick=async()=>{
+  const k=$("pdfMon").value;if(!k){pmsg("ยังไม่มีข้อมูลให้ส่งออก","m-warn");return}
+  if(!await pdfPrep())return;
+  const L=pdfPool().filter(r=>monKey(r)===k);
+  if(!L.length){pmsg("ไม่มีรายการของเดือนนี้","m-warn");return}
+  $("pdfMsg").style.display="none";openPdf(L,"แบบฟอร์มมิเตอร์_"+k+"_"+L.length+"ฉบับ");
+};
+$("sFee").onchange=()=>{$("sFeeAmt").classList.toggle("hide",$("sFee").value!=="pay")};
+
 const SYNC_URL="https://script.google.com/macros/s/AKfycbw5klIJvnpqnNdZN3RIFdju9JriuEjUJFvtXfEZOuXc5q9EqntEdQN6hzqiRkIi2T92/exec";
 function newId(){try{if(crypto&&crypto.randomUUID)return crypto.randomUUID()}catch(e){}return Date.now().toString(36)+Math.random().toString(36).slice(2,10)}
 function syncCfg(){let u="",c="",b="";try{u=localStorage.getItem("mcsyncurl")||"";c=localStorage.getItem("mcsynccode")||"";b=localStorage.getItem("mcsyncby")||""}catch(e){}return {url:(u||SYNC_URL).trim(),code:c,by:b}}
@@ -701,7 +874,7 @@ async function postSync(payload){
   const r=await fetch(c.url,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(Object.assign({code:c.code},payload))});
   const j=await r.json();if(!j.ok)throw new Error(j.error||"ผิดพลาด");return j;
 }
-function pubRec(r){const u=r.phU||{};return {id:r.id,time:r.time,date:r.date,old:r.old,oldSz:r.oldSz,oldRd:r.oldRd,cause:r.cause,note:r.note,nw:r.nw,newSz:r.newSz,newRd:r.newRd,by:syncCfg().by,kind:kindOf(r),phPair:u.pair||"",trash:r.trash||[]}}
+function pubRec(r){const u=r.phU||{};return {id:r.id,time:r.time,date:r.date,old:r.old,oldSz:r.oldSz,oldRd:r.oldRd,cause:r.cause,note:r.note,nw:r.nw,newSz:r.newSz,newRd:r.newRd,by:syncCfg().by,kind:kindOf(r),phPair:u.pair||"",ca:r.ca||"",name:r.name||"",house:r.house||"",moo:r.moo||"",tambon:r.tambon||"",fee:r.fee||"",feeAmt:r.feeAmt||"",trash:r.trash||[]}}
 function updSyncStatus(){
   const pend=swapList.filter(r=>r.synced===false).length;
   const t=cfgOK()?("🟢 เชื่อมข้อมูลทีมแล้ว"+(pend?" · 🟠 ค้างส่ง "+pend+" รายการ":" · ส่งครบแล้ว")):"⚪ ยังไม่ได้เชื่อมข้อมูลทีม (ข้อมูลเก็บในเครื่องนี้)";
@@ -709,6 +882,17 @@ function updSyncStatus(){
 }
 function errMsg(e){return e&&e.message==="Failed to fetch"?"ติดต่อชีตไม่ได้ (เช็กอินเทอร์เน็ต/ลิงก์ และใช้ได้เฉพาะเวอร์ชัน GitHub)":(e&&e.message==="คำสั่งไม่ถูกต้อง")?"สคริปต์ในชีตยังเป็นเวอร์ชันเก่า ให้วางโค้ด Apps Script ใหม่แล้ว Deploy เวอร์ชันใหม่":(e&&e.message)||"ผิดพลาด"}
 let syncing=false,syncAgain=false;
+async function piiMigrate(){
+  let done=false;try{done=localStorage.getItem("mcpii2")==="1"}catch(e){}
+  if(done)return;
+  try{
+    const j=await postSync({action:"ping"});
+    if(j.v>=2){
+      swapList.forEach(r=>{if(r.synced===true&&(r.ca||r.name||r.house||r.moo||r.tambon||r.fee))r.synced=false});
+      swSave();try{localStorage.setItem("mcpii2","1")}catch(e){}
+    }
+  }catch(e){}
+}
 async function uploadPhoto(r,s){
   const b=await idbGet(r.id+":"+s);
   if(!b){r.phD[s]=false;return}
@@ -724,6 +908,7 @@ async function syncPending(silent){
   if(syncing){syncAgain=true;return}
   syncing=true;let total=0,fail=null;
   try{
+    await piiMigrate();
     do{
       syncAgain=false;
       const pend=swapList.filter(r=>r.synced===false);
@@ -776,14 +961,18 @@ $("sCfgSave").onclick=async()=>{
 };
 $("sSyncNow").onclick=()=>syncPending(false);
 twoTap("sSyncOld","⬆️ ส่งรายการเก่าทั้งหมดขึ้นชีต",()=>{swapList.forEach(r=>{if(!r.id)r.id=newId();if(r.synced===undefined)r.synced=false});swSave();syncPending(false)});
+let teamLoaded=false;
 async function loadTeam(){
-  const info=$("sSrcInfo");info.textContent="กำลังโหลดข้อมูลทีม...";
+  const setI=x=>{$("sSrcInfo").textContent=x;if($("pdfSrc").value==="team")$("pdfSrcInfo").textContent=x};
+  setI("กำลังโหลดข้อมูลทีม...");
+  let ok=false;
   try{
     const j=await postSync({action:"list"});
     teamList=(j.rows||[]).map(r=>Object.assign({},r,{cause:r.cause||"",note:r.note||"",kind:r.kind||"defect"}));
-    info.textContent="ข้อมูลทั้งทีม "+teamList.length+" รายการ · โหลดเมื่อ "+nowStr().slice(11,16);
-  }catch(e){info.textContent="โหลดข้อมูลทีมไม่สำเร็จ: "+errMsg(e);teamList=[]}
-  sumRender();
+    teamLoaded=true;ok=true;
+    setI("ข้อมูลทั้งทีม "+teamList.length+" รายการ · โหลดเมื่อ "+nowStr().slice(11,16));
+  }catch(e){setI("โหลดข้อมูลทีมไม่สำเร็จ: "+errMsg(e));teamList=[];teamLoaded=false}
+  sumRender();pdfOpts();return ok;
 }
 $("sSrc").onchange=()=>{
   srcMode=$("sSrc").value;const t=srcMode==="team";
