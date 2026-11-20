@@ -782,7 +782,7 @@ function pdfData(r){
   const parts=String(r.name||"").trim().split(/\s+/).filter(Boolean),fn=parts.shift()||"",ln=parts.join(" ");
   const tm=String(r.time||"").match(/^(\d{4})-(\d{2})-(\d{2})/);
   const sd=tm?String(+tm[3]):day,sm=tm?TH_M[+tm[2]-1]:mon,sy=tm?String(+tm[1]+543):yr;
-  const d={d_day:day,d_mon:mon,d_year:yr,s_day:sd,s_mon:sm,s_year:sy,ca:r.ca||"",fname:fn,lname:ln,house:r.house||"",moo:r.moo||"",tambon:r.tambon||"",
+  const d={d_day:sd,d_mon:sm,d_year:sy,s_day:sd,s_mon:sm,s_year:sy,ca:r.ca||"",fname:fn,lname:ln,house:r.house||"",moo:r.moo||"",tambon:r.tambon||"",
     pea_old:r.old||"",serial:"",size:r.oldSz||"",phase:"",wire:"",maker:"",reading_old:r.oldRd||"",
     pea_new:r.nw||"",reading_new:r.newRd||"",size_new:r.newSz||"",other:"",
     fee:r.fee==="pay"?(r.feeAmt||""):"",p1:r.fee==="pay"?"fon":"",p2:r.fee==="free"?"fon":"",
